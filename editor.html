@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathEd</title>
+</head>
+
+<body>
+    <div id="math"></div>
+
+    <script type="module">
+        import './remarkable.min.js';
+        var md = new remarkable.Remarkable();
+
+        console.log(md.render('## Remarkable rulezz!'));
+    </script>
+</body>
+
+</html>
