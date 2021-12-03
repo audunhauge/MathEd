@@ -7,16 +7,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MathEd</title>
     <link rel="manifest" href="manifest.json">
+    <script src="/js/remarkable.min.js"></script>
+    <link rel="stylesheet" href="css/maed.css">
 </head>
 
 <body>
-    <div id="math"></div>
+    <div id="frame">
+        <div id="editor">
+            <div repeat id="lines">
+                <div>{plain}</div>
+            </div>
+            <div id="edbox" stil="--lino:{siffer}"><input type="text" id="line"></div>
+        </div>
+        <div id="math"></div>
+    </div>
+
 
     <script type="module">
-        import { thingsWithId } from './js/util.js';
-        const { math } = thingsWithId();
-        import './js/remarkable.min.js';
+        // import { thingsWithId } from './js/util.js';
+        import { thingsWithId, updateMyProperties } from './js/Minos.js';
+        const web = updateMyProperties();
+        const { math , editor, line} = thingsWithId();
+        //import './';
         var md = new remarkable.Remarkable();
+        web.siffer = 0;
+
+        line.onkeyup = (e) => {
+            const n = web.lines.length;
+            if (e.key === "Enter") {
+                web.lines.push({plain:web.line});
+                web.siffer = n + 1;
+            }
+            if (e.key === "ArrowUp" && web.siffer > 0) {
+                web.lines[web.siffer-1].plain = web.line;
+                web.siffer--;
+                web.line = web.lines[web.siffer-1].plain;
+            }
+            if (e.key === "ArrowDown" && web.siffer < n) {
+                web.lines[web.siffer-1].plain = web.line;
+                web.siffer++;
+                web.line = web.lines[web.siffer-1].plain;
+            }
+        }
 
         math.innerHTML = md.render('## Remarkable rulezz!');
         window.onload = () => {
