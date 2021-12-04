@@ -47,7 +47,7 @@ ed.onkeyup = (e) => {
                         displayMode: true,
                     });
                 } catch {
-                    latex = clean;
+                    latex = md.render(clean);
                 }
             }
             newMath[i] = latex;

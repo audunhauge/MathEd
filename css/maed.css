@@ -19,7 +19,8 @@
 #editor>textarea {
     font-size: 1.2rem;
     line-height: 1.7rem;
-    height: calc(min(80vh,60rem));
+    height: calc(min(60vh,60rem));
+    width: 90%;
 }
 
 #edbox>div {
