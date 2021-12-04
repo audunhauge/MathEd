@@ -1,13 +1,11 @@
-
-
 #frame {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
-#frame > div {
-    margin:1rem;
-    padding:5px;
+#frame>div {
+    margin: 1rem;
+    padding: 5px;
 }
 
 #lines {
@@ -18,13 +16,18 @@
     position: relative;
 }
 
-#edbox {
-    --lino:0;
-    position: absolute;
-    left:0;
-    top: calc( var(--lino) * 18px + 6px );
+#editor>textarea {
+    font-size: 1.2rem;
+    line-height: 1.7rem;
+    height: calc(min(80vh,60rem));
 }
 
-#edbox > div {
+#edbox>div {
     height: 16px;
+}
+
+#math>div {
+    min-height: 2px;
+    background-color: rgba(0, 128, 128, 0.178);
+    margin: 2px;
 }
