@@ -100,10 +100,13 @@ const renderAll = () => {
     const maths = [];
     let nr = 1;
     const txt = ed.value
-        .replace(/@plot\[(.+?)\]/gm, (_, fu, ofs) => {
-            graphs.push({ fu, id: `#gr${ofs}` });
-            return `<div class="graf" id="gr${ofs}"></div>\n`;
-        })
+        .replace(
+            /@plot\((.+)\)( \d+)?( [0-9a-z#,]+)?/g,
+            (_, fu, size, colors, ofs) => {
+                graphs.push({ fu, size, colors, id: `#gr${ofs}` });
+                return `<div class="graf" id="gr${ofs}"></div>`;
+            }
+        )
         .replace(/^@math( .+)?$([^€]+?)^$^/gm, (_, size, math, ofs) => {
             maths.push({ math, id: `ma${ofs}`, size });
             return `<div class="math ${size}" id="ma${ofs}"></div>\n`;
@@ -111,11 +114,22 @@ const renderAll = () => {
         .replace(/^@opp( .+)?$/gm, (_, txt) => {
             return `<div data-nr="${nr++}" class="oppgave">${txt || ""}</div>\n`;
         })
-    const plainHTML = md.render(txt).replace(/\$([^$]+)\$/gm, (_, m) =>
-        makeLatex(m, { mode: false, klass: "" }));
+    const plainHTML = md.render(txt)
+        .replace(/\$([^$]+)\$/gm, (_, m) => makeLatex(m, { mode: false, klass: "" }));
     mathView.innerHTML = plainHTML;
     maths.forEach(({ math, id, size }) => {
         renderMath(id, math, size);
+    });
+    graphs.forEach(({ fu, id, size, colors }) => {
+        try {
+            const optdObj = plot(fu, size, colors);
+            optdObj.target = id;
+            // @ts-ignore
+            functionPlot(optdObj);
+        } catch (e) {
+            console.log("Failed plot:", fu, e);
+            // show function with error
+        }
     });
     setLocalJSON(sessionID, ed.value);
 }
@@ -129,5 +143,90 @@ ed.onkeyup = (e) => {
     const render = k === "Enter" || k.includes("Arrow");
     if (render) {
         renderAll();
+    }
+}
+
+export function plot(str, size = 500, colors) {
+    let [o, ...rest] = str.split(",");
+    if (str.startsWith("{") || str.startsWith("[")) {
+        o = str;
+        rest = [];
+    }
+    let obj;
+    try {
+        obj = JSON.parse(o);
+    } catch (er) {
+        obj = o;
+    }
+    // Exaples:
+    // a plot(x)
+    // b plot(x,-5,5) 200
+    // c plot(x^2;x,-5,5,-25,25) 300 red,green,blue
+    // d plot([[1,2],[3,4],[5,6]])
+    // e plot([[1,2,4,8,16,32])
+    // f plot( {yAxis: {domain: [-1.897959183, 1.897959183]},xAxis: {domain: [-3, 3]},data: [{r: '2 * sin(4 theta)',fnType: 'polar',graphType: 'polyline' }] } )
+    // f plot({target: '#multiple',data: [ { fn: 'x', color: 'pink' }, { fn: '-x' }, { fn: 'x * x' }, { fn: 'x * x * x' }, { fn: 'x * x * x * x' } ] } )
+    let xmin = -5,
+        xmax = 5,
+        ymin,
+        ymax;
+    let width = +size,
+        height = +size;
+    const colorList = colors ? colors.trim().split(",") : [];
+    if (rest.length > 0) {
+        // type b,c
+        [xmin = -5, xmax = 5, ymin, ymax] = rest;
+    }
+    const optobj = {
+        width,
+        height,
+        xAxis: { domain: [+xmin, +xmax] },
+    };
+    if (ymin !== undefined && ymax !== undefined) {
+        optobj.yAxis = { domain: [+ymin, +ymax] };
+    }
+    if (Array.isArray(obj)) {
+        // type d,e
+        if (Array.isArray(obj[0])) {
+            ymax = obj.reduce((s, v) => Math.max(v[1], s), obj[0][1]);
+            ymin = obj.reduce((s, v) => Math.min(v[1], s), obj[0][1]);
+            xmax = obj.reduce((s, v) => Math.max(v[0], s), obj[0][0]);
+            xmin = obj.reduce((s, v) => Math.min(v[0], s), obj[0][0]);
+            optobj.yAxis = { domain: [ymin - 2, ymax + 2] };
+            optobj.xAxis = { domain: [xmin, xmax] };
+            // type d
+            // data: [{ points: [  [1, 1],  [2, 1], [2, 2],  [1, 2],  [1, 1]  ],  fnType: 'points',  graphType: 'scatter'  }]
+            optobj.data = [{ points: obj, fnType: "points", graphType: "scatter" }];
+            // @ts-ignore
+            return optobj;
+        } else {
+            // type e
+            ymax = Math.max(...obj);
+            ymin = Math.min(...obj);
+            xmin = 0;
+            xmax = obj.length;
+            optobj.yAxis = { domain: [ymin - 2, ymax + 2] };
+            optobj.xAxis = { domain: [xmin, xmax] };
+            const points = obj.map((e, i) => [i, e]);
+            optobj.data = [{ points, fnType: "points", graphType: "scatter" }];
+            // @ts-ignore
+            return optobj;
+        }
+    } else if (typeof o === "string") {
+        // type a,b,c
+        optobj.data = obj.split(";").map((fu, i) => {
+            const obj = { fn: fu, graphType: "polyline" };
+            if (colorList[i]) obj.color = colorList[i];
+            return obj;
+        });
+        // @ts-ignore
+        return optobj;
+    } else if (typeof obj === "object") {
+        // type f
+        // @ts-ignore
+        return o;
+    } else {
+        console.log("plot() given invalid params");
+        return {};
     }
 }
