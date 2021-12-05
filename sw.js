@@ -4,7 +4,14 @@ var filesToCache = [
   '/editor.html',
   '/css/maed.css',
   '/js/remarkable.min.js',
-  '/js/util.js'
+  '/js/katex/katex.min.js',
+  '/js/katex/katex.min.css',
+  '/js/katex/fonts/KaTeX_AMS-Regular.woff2',
+  '/js/util.js',
+  '/js/algebrite.min.js',
+  '/js/function-plot.js',
+  '/js/mathlex.min.js',
+  '/js/Minos.js',
 ];
 
 /* Start the service worker and cache all of the app's content */

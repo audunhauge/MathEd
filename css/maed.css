@@ -3,17 +3,30 @@
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
+div.oppgave {
+    color: green;
+    font-size: 1em;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+div.oppgave::before {
+    content: "Oppgave " attr(data-nr);
+    color: blue;
+    font-size: 1.5em;
+}
+
 #frame>div {
     margin: 1rem;
     padding: 5px;
 }
 
-#lines {
-    min-height: 2rem;
-}
-
 #editor {
     position: relative;
+}
+
+#mathView {
+   padding:3px;
 }
 
 #editor>textarea {
@@ -26,9 +39,50 @@
 #edbox>div {
     height: 16px;
 }
-
-#math>div {
+/*
+.math > div {
     min-height: 2px;
     background-color: rgba(0, 128, 128, 0.178);
     margin: 2px;
+}*/
+
+div.math {
+    counter-reset: math-count;
 }
+
+div.math > div {
+    position: relative;
+    margin-left: 3rem;
+}
+div.math > div > div {
+    counter-increment: math-count;
+}
+
+.math div.eq {
+    display: grid;
+    grid-template-columns: 10fr 1fr 10fr;
+}
+
+div.math.abc > div > div:before,
+div.math.bokstav > div > div:before {
+    content: counter(math-count,lower-alpha) ") ";
+    position: absolute;
+    left:-40px;
+    top:0;
+}
+
+div.math.likningsett > div > div:before {
+    content: counter(math-count,lower-roman) ") ";
+    position: absolute;
+    left:-40px;
+    top:0;
+}
+
+
+div.eq > span:nth-child(1) {
+    text-align: right;
+}
+div.eq > span:nth-child(2) {
+    text-align: center;
+}
+

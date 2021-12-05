@@ -20,12 +20,32 @@
 
 <body>
     <div id="frame">
+
         <div id="editor">
-            <textarea name="ed" id="ed" cols="30" rows="10"></textarea>
+            <div>
+                <label>Editor font size
+                    <input id="efs" type="range" min="30" max="100">
+                </label>{efs/50}
+            </div>
+            <textarea name="ed" id="ed" cols="30" rows="10"
+            stil="font-size:{efs/50}rem;line-height:{efs/50}rem;">
+
+            </textarea>
         </div>
-        <div repeat id="math">
-            <div>{latex}</div>
+        <div>
+            <div>
+                <label>Font size
+                    <input id="fs" type="range" min="30" max="100"> {fs/50}
+                </label>
+                <!--label>Math width
+                    <input id="bw" type="range" min="10" max="100"> {bw}
+                </label-->
+            </div>
+            <div id="mathView" stil="font-size:{fs/50}rem;width:{bw}rem;">
+
+            </div>
         </div>
+
     </div>
 
 
