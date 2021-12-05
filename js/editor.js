@@ -17,6 +17,12 @@ web.fs = 50;   // math region font size
 web.efs = 50;  // editor font size
 ed.value = oldSession || "";
 
+// @ts-ignore
+const simplify = exp => Algebrite.simplify(exp);
+// @ts-ignore
+const roots = exp => Algebrite.root(exp);
+// algebrite to latex
+const alg2tex = alg => alg.toLatexString();
 
 
 // @ts-ignore
@@ -78,6 +84,23 @@ const renderLikning = (line, { mode, klass }) => {
     <span>${rightLatex}</span></div>`;
 }
 
+function renderAlgebra(id,txt,size="") {
+    //const clean = cleanUpMathLex(txt);
+    //const math = alg2tex(simplify(clean));
+    //renderMath(id, math);
+    const newMath = [];
+    const mode = size.includes("senter");
+    const klass = size;
+    const lines = txt.split('\n').filter(e => e != "");
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const clean = cleanUpMathLex(line);
+        const math = alg2tex(simplify(clean));
+        newMath[i] = renderSimple(math,{mode,klass});
+    }
+    $(id).innerHTML = wrap(newMath, 'div');
+}
+
 function renderMath(id, math, size = "") {
     const newMath = [];
     const mode = size.includes("senter");
@@ -98,6 +121,7 @@ function renderMath(id, math, size = "") {
 const renderAll = () => {
     const graphs = [];
     const maths = [];
+    const algebra = [];
     let nr = 1;
     const txt = ed.value
         .replace(
@@ -111,6 +135,10 @@ const renderAll = () => {
             maths.push({ math, id: `ma${ofs}`, size });
             return `<div class="math ${size}" id="ma${ofs}"></div>\n`;
         })
+        .replace(/^@alg( .+)?$([^€]+?)^$^/gm, (_, size, math, ofs) => {
+            algebra.push({ math, id: `alg${ofs}`, size });
+            return `<div class="algebra" id="alg${ofs}"></div>\n`;
+        })
         .replace(/^@opp( .+)?$/gm, (_, txt) => {
             return `<div data-nr="${nr++}" class="oppgave">${txt || ""}</div>\n`;
         })
@@ -119,6 +147,9 @@ const renderAll = () => {
     mathView.innerHTML = plainHTML;
     maths.forEach(({ math, id, size }) => {
         renderMath(id, math, size);
+    });
+    algebra.forEach(({ math, id, size }) => {
+        renderAlgebra(id, math, size)
     });
     graphs.forEach(({ fu, id, size, colors }) => {
         try {
