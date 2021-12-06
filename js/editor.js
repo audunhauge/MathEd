@@ -5,6 +5,13 @@ import {
     thingsWithId, updateMyProperties,
     wrap, $, getLocalJSON, setLocalJSON
 } from './Minos.js';
+
+import { showDirButton } from './filehandling.js';
+
+showDirButton("fy",list => {
+    console.log(list);
+});
+
 const web = updateMyProperties();
 // @ts-ignore
 const { mathView, ed } = thingsWithId();
