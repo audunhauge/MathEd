@@ -86,3 +86,25 @@ div.eq > span:nth-child(2) {
     text-align: center;
 }
 
+#menu {
+    display:grid;
+    width: 15rem;
+    grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr));
+}
+
+#menu > div.button {
+    background-color: blue;
+    color:white;
+    border-radius: 5px;
+    width:4rem;
+    text-align: center;
+    box-shadow: 2px 2px 2px black;
+    transition: 200ms;
+    cursor:pointer;
+}
+
+
+#menu > div.button:active {
+    transform: translate(2px,2px);
+    box-shadow: none;
+}

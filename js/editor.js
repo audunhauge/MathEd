@@ -6,11 +6,7 @@ import {
     wrap, $, getLocalJSON, setLocalJSON
 } from './Minos.js';
 
-import { showDirButton } from './filehandling.js';
-
-showDirButton("fy",list => {
-    console.log(list);
-});
+import { saveFileButton, readFileButton } from './filehandling.js';
 
 const web = updateMyProperties();
 // @ts-ignore
@@ -23,6 +19,7 @@ const oldSession = getLocalJSON(sessionID);  // previous contents
 web.fs = 50;   // math region font size
 web.efs = 50;  // editor font size
 ed.value = oldSession || "";
+
 
 // @ts-ignore
 const simplify = exp => Algebrite.simplify(exp);
@@ -175,6 +172,17 @@ const renderAll = () => {
 if (oldSession) {
     renderAll();
 }
+
+
+readFileButton("load",(file,text) => {
+    ed.value = text;
+    renderAll();
+    web.filename = file.name;
+});
+
+saveFileButton("save",() => {
+    return ed.value;
+});
 
 ed.onkeyup = (e) => {
     const k = e.key;
