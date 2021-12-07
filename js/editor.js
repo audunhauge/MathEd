@@ -6,6 +6,8 @@ import {
     wrap, $, getLocalJSON, setLocalJSON
 } from './Minos.js';
 
+const {min,max} = Math;
+
 import { saveFileButton, readFileButton } from './filehandling.js';
 
 const web = updateMyProperties();
@@ -216,8 +218,8 @@ export function plot(str, size = 500, colors) {
         xmax = 5,
         ymin,
         ymax;
-    let width = +size,
-        height = +size;
+    let width = max(70,+size),
+        height = max(70,+size);
     const colorList = colors ? colors.trim().split(",") : [];
     if (rest.length > 0) {
         // type b,c
