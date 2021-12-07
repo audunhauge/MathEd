@@ -1,9 +1,11 @@
 #frame {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    counter-reset: oppg-count;
 }
 
 div.oppgave {
+    counter-increment: oppg-count;
     color: green;
     font-size: 1em;
     margin-bottom: 5px;
@@ -11,8 +13,21 @@ div.oppgave {
 }
 
 div.oppgave::before {
-    content: "Oppgave " attr(data-nr);
+    content: "Oppgave " counter(oppg-count) ") ";
     color: blue;
+    font-size: 1.5em;
+}
+
+div.fasit {
+    counter-reset: oppg-count;
+    font-size: 1em;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+div.fasit::before {
+    content: "Fasit ";
+    color: rgb(3, 46, 3);
     font-size: 1.5em;
 }
 
@@ -26,19 +41,20 @@ div.oppgave::before {
 }
 
 #mathView {
-   padding:3px;
+    padding: 3px;
 }
 
 #editor>textarea {
     font-size: 1.2rem;
     line-height: 1.7rem;
-    height: calc(min(60vh,60rem));
+    height: calc(min(60vh, 60rem));
     width: 90%;
 }
 
 #edbox>div {
     height: 16px;
 }
+
 /*
 .math > div {
     min-height: 2px;
@@ -46,15 +62,19 @@ div.oppgave::before {
     margin: 2px;
 }*/
 
+div.algebra,
 div.math {
     counter-reset: math-count;
 }
 
-div.math > div {
+div.algebra>div,
+div.math>div {
     position: relative;
     margin-left: 3rem;
 }
-div.math > div > div {
+
+div.algebra>div,
+div.math>div>div {
     counter-increment: math-count;
 }
 
@@ -63,48 +83,116 @@ div.math > div > div {
     grid-template-columns: 10fr 1fr 10fr;
 }
 
-div.math.abc > div > div:before,
-div.math.bokstav > div > div:before {
-    content: counter(math-count,lower-alpha) ") ";
+div.algebra.abc>div::before,
+div.math.abc>div>div:before,
+div.math.bokstav>div>div:before {
+    content: counter(math-count, lower-alpha) ") ";
     position: absolute;
-    left:-40px;
-    top:0;
+    left: -40px;
+    top: 0;
 }
 
-div.math.likningsett > div > div:before {
-    content: counter(math-count,lower-roman) ") ";
+div.algebra.number>div::before,
+div.algebra.nummer>div::before {
+    content: counter(math-count) ") ";
     position: absolute;
-    left:-40px;
-    top:0;
+    left: -40px;
+    top: 0;
+}
+
+div.math.likningsett>div>div:before {
+    content: counter(math-count, lower-roman) ") ";
+    position: absolute;
+    left: -40px;
+    top: 0;
 }
 
 
-div.eq > span:nth-child(1) {
+div.eq>span:nth-child(1) {
     text-align: right;
 }
-div.eq > span:nth-child(2) {
+
+div.eq>span:nth-child(2) {
     text-align: center;
 }
 
 #menu {
-    display:grid;
+    display: grid;
     width: 15rem;
     grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr));
 }
 
-#menu > div.button {
+#menu>div.button {
     background-color: blue;
-    color:white;
+    color: white;
     border-radius: 5px;
-    width:4rem;
+    width: 4rem;
     text-align: center;
     box-shadow: 2px 2px 2px black;
     transition: 200ms;
-    cursor:pointer;
+    cursor: pointer;
 }
 
 
-#menu > div.button:active {
-    transform: translate(2px,2px);
+#menu>div.button:active {
+    transform: translate(2px, 2px);
     box-shadow: none;
+}
+
+div.plots {
+    --min: 400px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--min), 1fr));
+    counter-reset: plot-count;
+}
+
+div.plots>div {
+    position: relative;
+    counter-increment: plot-count;
+    padding-right: 2rem;
+    width: fit-content;
+}
+
+
+div.senter>div {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div.plots>div::before {
+    position: absolute;
+    left: 5px;
+    top: 10px;
+    color: blue;
+}
+
+div.plots.abc>div::before {
+    content: counter(plot-count, lower-alpha) ") ";
+
+}
+
+div.plots.roman>div::before {
+    content: counter(plot-count, lower-roman) ") ";
+}
+
+
+div.plots.nummer>div::before {
+    content: counter(plot-count) ") ";
+}
+
+div.algebra>div {
+    display: grid;
+    grid-template-columns: 10fr 1fr 10fr;
+    padding-bottom: 4px;
+    color: darkgreen;
+}
+
+div.algebra>div>span:nth-child(1) {
+    text-align: right;
+    color: blue;
+}
+
+div.algebra>div>span:nth-child(2) {
+    text-align: center;
+    padding: 0 16px;
 }

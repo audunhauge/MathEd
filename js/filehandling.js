@@ -55,6 +55,7 @@ async function getNewFileHandle() {
             },
         ],
     };
+    // @ts-ignore
     const handle = await window.showSaveFilePicker(options);
     return handle;
 }

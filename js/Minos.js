@@ -440,17 +440,17 @@ export const setLocalJSON = (k, v) => localStorage.setItem(k, JSON.stringify(v))
  * Also contains wait()
  */
 export class Keys {
-    static #keys = [];
+    static keys = [];
 
     static init() {
-        document.addEventListener("keydown", Keys.#down);
-        document.addEventListener("keyup", Keys.#up);
+        document.addEventListener("keydown", Keys.down);
+        document.addEventListener("keyup", Keys.up);
     }
-    static #down(e) {
-        Keys.#keys[e.key] = 1;
+    static down(e) {
+        Keys.keys[e.key] = 1;
     }
-    static #up(e) {
-        Keys.#keys[e.key] = 0;
+    static up(e) {
+        Keys.keys[e.key] = 0;
     }
     /**
      * True if this key is currently pressed
@@ -458,7 +458,7 @@ export class Keys {
      * @returns {boolean}
      */
     static has(k) {
-        return Keys.#keys[k] === 1;
+        return Keys.keys[k] === 1;
     }
 
     /**
@@ -466,7 +466,7 @@ export class Keys {
      * @returns {boolean }
      */
     static any() {
-        return Keys.#keys.some(e => e === 1);
+        return Keys.keys.some(e => e === 1);
     }
 
     /**

@@ -3,10 +3,10 @@
 
 import {
     thingsWithId, updateMyProperties,
-    wrap, $, getLocalJSON, setLocalJSON
+    wrap, $, create, getLocalJSON, setLocalJSON
 } from './Minos.js';
 
-const {min,max} = Math;
+const { min, max } = Math;
 
 import { saveFileButton, readFileButton } from './filehandling.js';
 
@@ -70,7 +70,7 @@ const makeLatex = (txt, { mode, klass }) => {
     } catch (e) {
         console.log(e);
         return katx(String(clean), mode);
-        return clean;
+        //return clean;
     }
 }
 
@@ -90,7 +90,7 @@ const renderLikning = (line, { mode, klass }) => {
     <span>${rightLatex}</span></div>`;
 }
 
-function renderAlgebra(id,txt,size="") {
+function renderAlgebra(id, txt, size = "") {
     //const clean = cleanUpMathLex(txt);
     //const math = alg2tex(simplify(clean));
     //renderMath(id, math);
@@ -98,11 +98,14 @@ function renderAlgebra(id,txt,size="") {
     const mode = size.includes("senter");
     const klass = size;
     const lines = txt.split('\n').filter(e => e != "");
+    const gives = renderSimple("\\rightarrow", { mode, klass });
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         const clean = cleanUpMathLex(line);
         const math = alg2tex(simplify(clean));
-        newMath[i] = renderSimple(math,{mode,klass});
+        newMath[i] = `<span>${line}</span>
+        <span>${gives}</span>
+        <span>${renderSimple(math, { mode, klass })}</span>`;
     }
     $(id).innerHTML = wrap(newMath, 'div');
 }
@@ -124,29 +127,54 @@ function renderMath(id, math, size = "") {
     $(id).innerHTML = wrap(newMath, 'div');
 }
 
+function plotGraph(parent, fu, size, colors) {
+    const div = create('div');
+    div.id = "plot" + Date.now();
+    parent.append(div);
+    try {
+        const optdObj = plot(fu, size, colors);
+        optdObj.target = "#" + div.id;
+        // @ts-ignore
+        functionPlot(optdObj);
+    } catch (e) {
+        console.log("Failed plot:", fu, e);
+    }
+}
+
+function renderPlot(id, plot, klass) {
+    const parent = $(id);
+    const [_, width = 350] = (klass.match(/ (\d+)$/)) || [];
+    parent.style.setProperty("--min", String(width) + "px");
+    const lines = plot.split('\n').filter(e => e != "");
+    for (let i = 0; i < lines.length; i++) {
+        const pickApart = lines[i].match(/([^ ]+)( \d+)?( [0-9a-z#,]+)?/);
+        const [_, fu, size = 500, colors] = pickApart;
+        plotGraph(parent, cleanUpMathLex(fu), min(size, width), colors);
+    }
+}
+
 const renderAll = () => {
-    const graphs = [];
+    const plots = [];
     const maths = [];
     const algebra = [];
-    let nr = 1;
     const txt = ed.value
-        .replace(
-            /@plot\((.+)\)( \d+)?( [0-9a-z#,]+)?/g,
-            (_, fu, size, colors, ofs) => {
-                graphs.push({ fu, size, colors, id: `#gr${ofs}` });
-                return `<div class="graf" id="gr${ofs}"></div>`;
-            }
-        )
+        .replace(/@plot( .+)?$([^€]+?)^$^/gm, (_, klass, plot, ofs) => {
+            plots.push({ plot, id: `graf${ofs}`, klass });
+            return `<div class="plots ${klass}" id="graf${ofs}"></div>\n`;
+        })
         .replace(/^@math( .+)?$([^€]+?)^$^/gm, (_, size, math, ofs) => {
             maths.push({ math, id: `ma${ofs}`, size });
             return `<div class="math ${size}" id="ma${ofs}"></div>\n`;
         })
         .replace(/^@alg( .+)?$([^€]+?)^$^/gm, (_, size, math, ofs) => {
             algebra.push({ math, id: `alg${ofs}`, size });
-            return `<div class="algebra" id="alg${ofs}"></div>\n`;
+            return `<div class="algebra ${size}" id="alg${ofs}"></div>\n`;
         })
         .replace(/^@opp( .+)?$/gm, (_, txt) => {
-            return `<div data-nr="${nr++}" class="oppgave">${txt || ""}</div>\n`;
+            return `<div class="oppgave">${txt || ""}</div>\n`;
+        })
+        .replace(/^@fasit( .+)?$/gm, (_, txt) => {
+            return `<div class="fasit">${txt || ""}</div>\n`;
         })
     const plainHTML = md.render(txt)
         .replace(/\$([^$]+)\$/gm, (_, m) => makeLatex(m, { mode: false, klass: "" }));
@@ -157,16 +185,8 @@ const renderAll = () => {
     algebra.forEach(({ math, id, size }) => {
         renderAlgebra(id, math, size)
     });
-    graphs.forEach(({ fu, id, size, colors }) => {
-        try {
-            const optdObj = plot(fu, size, colors);
-            optdObj.target = id;
-            // @ts-ignore
-            functionPlot(optdObj);
-        } catch (e) {
-            console.log("Failed plot:", fu, e);
-            // show function with error
-        }
+    plots.forEach(({ plot, id, klass }) => {
+        renderPlot(id, plot, klass);
     });
     setLocalJSON(sessionID, ed.value);
 }
@@ -176,13 +196,13 @@ if (oldSession) {
 }
 
 
-readFileButton("load",(file,text) => {
+readFileButton("load", (file, text) => {
     ed.value = text;
     renderAll();
     web.filename = file.name;
 });
 
-saveFileButton("save",() => {
+saveFileButton("save", () => {
     return ed.value;
 });
 
@@ -218,8 +238,8 @@ export function plot(str, size = 500, colors) {
         xmax = 5,
         ymin,
         ymax;
-    let width = max(70,+size),
-        height = max(70,+size);
+    let width = max(70, +size),
+        height = max(70, +size);
     const colorList = colors ? colors.trim().split(",") : [];
     if (rest.length > 0) {
         // type b,c
