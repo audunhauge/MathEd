@@ -51,12 +51,6 @@
 
     <script type="module">
         import './js/editor.js';
-        window.onload = () => {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker
-                    .register('./sw.js');
-            }
-        }
     </script>
 </body>
 
