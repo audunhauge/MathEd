@@ -1,6 +1,5 @@
 // @ts-check
 
-
 import {
     thingsWithId, updateMyProperties,
     wrap, $, create, getLocalJSON, setLocalJSON
@@ -16,11 +15,13 @@ const { mathView, ed } = thingsWithId();
 
 const sessionID = "mathEd";
 const oldSession = getLocalJSON(sessionID);  // previous contents
+const filename = getLocalJSON("filename") || "test.mtx"; // filename
 
 // set starting font size to 50/50 rem
 web.fs = 50;   // math region font size
 web.efs = 50;  // editor font size
 ed.value = oldSession || "";
+web.filename = filename;
 
 
 // @ts-ignore
@@ -142,7 +143,7 @@ function plotGraph(parent, fu, size, colors) {
     }
 }
 
-function renderPlot(id, plot, klass) {
+function renderPlot(id, plot, klass="") {
     const parent = $(id);
     const [_, width = 350] = (klass.match(/ (\d+)$/)) || [];
     parent.style.setProperty("--min", String(width) + "px");
@@ -204,7 +205,14 @@ readFileButton("load", (file, text) => {
     web.filename = file.name;
 });
 
-saveFileButton("save", () => {
+saveFileButton("save", filename, (newName) => {
+    setLocalJSON("filename",newName);
+    web.filename = newName;
+    const savedFiles = getLocalJSON("savedfiles") || [];
+    savedFiles.push(newName);
+    const uniq = new Set(savedFiles);
+    setLocalJSON("savedfiles",Array.from(uniq));
+    setLocalJSON("saved:"+newName,ed.value);
     return ed.value;
 });
 

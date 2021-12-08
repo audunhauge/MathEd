@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math test editor</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <header>
+        <h2>Math editor</h2>
+        Make tests for mathematics.
+        <p>
+            Uses markdown, mathlex, katex, algebrite and functionplot.
+        </p>
+
+
+    </header>
+    <main>
+        <section>
+
+            <div class="grid-2">
+                <div>
+                    <h3>Example files</h3>
+                    Click one of the examples below to edit.
+                    <div class="listing" repeat id="examples">
+                        <div data-name="ex$.md" class="file"><label >$</label></div>
+                    </div>
+                </div>
+                <div>
+                    <h3>Recent files</h3>
+                    Click filename to edit.
+                    <div  class="listing" repeat id="savedFiles">
+                        <div data-name="$" class="file"><label>$</label></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="info">
+            <ul>
+                <li>@opp creates a question
+                    <p>
+                        Displays "Oppgave 1." in large font.
+                        The number increments for each @opp.
+                        The counter is reset by @fasit.
+                    </p>
+                </li>
+                <li>@math starts a math block
+                    <pre>
+                    @math abc
+                    x^x+2x+3
+                    2x+4
+                </pre>
+                    <p>
+                        Displayed using KaTex:
+                    <pre>
+                    a)     xx+2x+3
+                    b)     2x+4
+                </pre>
+                    </p>
+                </li>
+                <li>@plot sets up for plotting graphs</li>
+                <li>@alg starts algebra block</li>
+                <li>@fasit marks end of questions - solutions follow</li>
+
+            </ul>
+        </section>
+    </main>
+    <footer></footer>
+    <script type="module">
+        import './js/filemanager.js';
+        window.onload = () => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker
+                    .register('./sw.js');
+            }
+        }
+    </script>
+</body>
+
+</html>

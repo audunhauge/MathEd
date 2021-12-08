@@ -44,8 +44,9 @@ export const readFileButton = (id, cb) => {
     });
 }
 
-async function getNewFileHandle() {
+async function getNewFileHandle(suggestedName) {
     const options = {
+        suggestedName,
         types: [
             {
                 description: 'Text Files',
@@ -69,11 +70,11 @@ async function writeFile(fileHandle, contents) {
     await writable.close();
 }
 
-export const saveFileButton = (id, cb) => {
+export const saveFileButton = (id,filename, cb) => {
     const saveButton = $(id);
     saveButton.addEventListener("click", async () => {
-        const fh = await getNewFileHandle();
-        writeFile(fh,cb());
+        const fh = await getNewFileHandle(filename);
+        writeFile(fh,cb(fh.name));
     })
     
 }
