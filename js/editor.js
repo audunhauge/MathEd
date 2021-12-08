@@ -5,6 +5,8 @@ import {
     wrap, $, create, getLocalJSON, setLocalJSON
 } from './Minos.js';
 
+import { code2svg } from './trig.js';
+
 const { min, max } = Math;
 
 import { saveFileButton, readFileButton } from './filehandling.js';
@@ -69,7 +71,7 @@ const makeLatex = (txt, { mode, klass }) => {
         const tex = MathLex.render(m, "latex");
         return katx(String(tex), mode);
     } catch (e) {
-        console.log(e);
+        console.log(e, txt, clean);
         return katx(String(clean), mode);
         //return clean;
     }
@@ -81,7 +83,7 @@ const renderSimple = (line, { mode, klass }) => {
 }
 
 const renderLikning = (line, { mode, klass }) => {
-    const [sep] = line.match(/>=|<=|>|<|=/);
+    const [sep] = (line.match(/>=|<=|>|<|=/) || []);
     const [left = "", right = ""] = line.split(sep);
     const leftLatex = makeLatex(left, { mode, klass });
     const rightLatex = makeLatex(right, { mode, klass });
@@ -143,7 +145,7 @@ function plotGraph(parent, fu, size, colors) {
     }
 }
 
-function renderPlot(id, plot, klass="") {
+function renderPlot(id, plot, klass = "") {
     const parent = $(id);
     const [_, width = 350] = (klass.match(/ (\d+)$/)) || [];
     parent.style.setProperty("--min", String(width) + "px");
@@ -155,14 +157,33 @@ function renderPlot(id, plot, klass="") {
     }
 }
 
+function renderTrig(id, trig, klass = "") {
+    const parent = $(id);
+    const [_, w = 350, sz = 8] = (klass.match(/ (\d+) (\d+)$/)) || [];
+    //arent.style.setProperty("--min", String(width) + "px");
+    const lines = trig.split('\n').filter(e => e != "");
+    const svg = code2svg(lines, w, sz);
+    const s = Number(w) / 500;
+    parent.innerHTML = `<svg id="${id}" width="${w}" viewBox="0 0  ${w} ${w}"> 
+      <g transform="scale(${s})">
+        ${svg}
+      </g>
+    </svg>`;
+}
+
 const renderAll = () => {
     const plots = [];
     const maths = [];
     const algebra = [];
+    const trigs = [];
     const txt = ed.value
         .replace(/@plot( .+)?$([^€]+?)^$^/gm, (_, klass, plot, ofs) => {
             plots.push({ plot, id: `graf${ofs}`, klass });
             return `<div class="plots ${klass}" id="graf${ofs}"></div>\n`;
+        })
+        .replace(/@trig( .+)?$([^€]+?)^$^/gm, (_, klass, trig, ofs) => {
+            trigs.push({ trig, id: `trig${ofs}`, klass });
+            return `<div class="trig ${klass}" id="trig${ofs}"></div>\n`;
         })
         .replace(/^@math( .+)?$([^€]+?)^$^/gm, (_, size, math, ofs) => {
             maths.push({ math, id: `ma${ofs}`, size });
@@ -191,6 +212,9 @@ const renderAll = () => {
     plots.forEach(({ plot, id, klass }) => {
         renderPlot(id, plot, klass);
     });
+    trigs.forEach(({ trig, id, klass }) => {
+        renderTrig(id, trig, klass);
+    });
     setLocalJSON(sessionID, ed.value);
 }
 
@@ -206,13 +230,13 @@ readFileButton("load", (file, text) => {
 });
 
 saveFileButton("save", filename, (newName) => {
-    setLocalJSON("filename",newName);
+    setLocalJSON("filename", newName);
     web.filename = newName;
     const savedFiles = getLocalJSON("savedfiles") || [];
     savedFiles.push(newName);
     const uniq = new Set(savedFiles);
-    setLocalJSON("savedfiles",Array.from(uniq));
-    setLocalJSON("saved:"+newName,ed.value);
+    setLocalJSON("savedfiles", Array.from(uniq));
+    setLocalJSON("saved:" + newName, ed.value);
     return ed.value;
 });
 

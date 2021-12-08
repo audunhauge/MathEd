@@ -49,6 +49,40 @@ const fy = (y, size) => {
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
+const shuffle = (elements) => {
+    let length = elements.length;
+    let shuffled = Array(length);
+    for (let index = 0; index < length; index++) {
+        let rand = Math.round(Math.random() * index);
+        if (rand !== index) shuffled[index] = shuffled[rand];
+        shuffled[rand] = elements[index];
+    }
+    return shuffled;
+}
+const range = (lo, hi, step = 1) => {
+    // range(1,10,1) => [1,2,3,4,5,6,7,8,9]
+    // range(1,4,0.1) => [1.0, 1.1, 1.2, 1.3 .. 3.9]
+    step = step === 0 || isNaN(step) ? 1 : step;
+    let list = [],
+        i = lo;
+    if (hi <= lo) return list;
+    while (i < hi) {
+        list.push(i.toFixed(2));
+        i += step;
+    }
+    return list;
+}
+const roll = (lo, hi) => {
+    if (lo == undefined) {
+        return Math.random();
+    }
+    if (hi == undefined) {
+        hi = lo;
+        lo = 1;
+    }
+    return Math.floor(Math.random() * (1 + hi - lo)) + lo;
+}
+
 
 class Point {
 
@@ -142,9 +176,9 @@ const circumcirc = (param) => {
 
 
 const svgOuter = (contents, w = 500) => {
-  let s = w / 500;
-  let id = "s" + Date.now();
-  return `<svg id="${id}" width="${w}" viewBox="0 0  ${w} ${w}"> 
+    let s = w / 500;
+    let id = "s" + Date.now();
+    return `<svg id="${id}" width="${w}" viewBox="0 0  ${w} ${w}"> 
     <g transform="scale(${s})">
       ${contents}
     </g>
@@ -513,4 +547,50 @@ const trig = param => {
 
 const triangle = (p, q, a, b, c, px, sx, color, angs) => {
     return trig({ p, q, a, b, c });
+}
+
+const { sqrt, sin, cos, tan, asin, atan2, acos, atan, PI:π,
+    log:ln, log10:lg, log, abs, max, min, random: rnd } = Math;
+
+
+
+const mathEnvironment = {
+    SIN, COS, ASIN, Point, nice, fx, fy, clamp, triheight, circumcirc,
+    svgCircle, svgLine, svgSquare, svgText, svgDot, tri2svg, tri,
+    abs, max, min, rnd, roll, shuffle, range, sqrt, ln, lg, log,
+    sin,cos,tan,asin,atan2,acos,atan,π,
+}
+
+const eva = (exp, variables) => {
+    let v = "";
+    const [lhs,value]= exp.split("=");
+    try {
+        function ctxEval(exp, ctx) { // evaluates expression in the scope of context object
+            return (new Function('expression', 'context', 'with(context){return eval(expression)}'))(exp, ctx);
+        }
+        v = ctxEval(exp, variables);
+    } catch (error) {
+        console.log(error, exp, variables);
+    }
+    if (!value && v && v.charAt(0) === '<') {
+        // not p=xxx, assume we have svg fragment
+        variables.SVG += v;
+    }
+    return v;
+}
+
+/**
+ * 
+ * @param {array} kode lines of code to evaluate
+ */
+export const code2svg = (kode,width,s) => {
+    const variables = { SVG: "" };
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        .split("").forEach(e => variables[e] = 0);
+    Object.assign(variables, mathEnvironment);
+    kode.forEach(line => {
+        eva(line, variables);
+    });
+    return variables.SVG;
+
 }
