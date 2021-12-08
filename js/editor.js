@@ -142,7 +142,7 @@ function plotGraph(parent, fu, size, colors) {
     }
 }
 
-function renderPlot(id, plot, klass) {
+function renderPlot(id, plot, klass="") {
     const parent = $(id);
     const [_, width = 350] = (klass.match(/ (\d+)$/)) || [];
     parent.style.setProperty("--min", String(width) + "px");
