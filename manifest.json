@@ -1,7 +1,7 @@
 {
     "short_name": "MathEd",
     "name": "Math Editor",
-    "start_url": "/editor.html",
+    "start_url": "/index.html",
     "background_color": "#3367D6",
     "display": "standalone",
     "scope": "/",
@@ -9,12 +9,12 @@
     "description": "Math Editor",
     "icons": [
         {
-            "src": "media/hello-icon-128.png",
+            "src": "media/maed-128.png",
             "sizes": "128x128",
             "type": "image/png"
         },
         {
-            "src": "media/hello-icon-144.png",
+            "src": "media/maed-144.png",
             "sizes": "144x144",
             "type": "image/png"
         }

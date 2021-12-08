@@ -1,8 +1,12 @@
 var cacheName = 'mathEditor';
 var filesToCache = [
   '/',
+  '/index.html',
   '/editor.html',
   '/css/maed.css',
+  '/css/index.css',
+  '/media/maed-128.png',
+  '/media/maed-144.png',
   '/js/remarkable.min.js',
   '/js/katex/katex.min.js',
   '/js/katex/katex.min.css',
@@ -10,6 +14,8 @@ var filesToCache = [
   '/js/util.js',
   '/js/d3.min.js',
   '/js/editor.js',
+  '/js/trig.js',
+  '/js/filemanager.js',
   '/js/filehandling.js',
   '/js/algebrite.min.js',
   '/js/function-plot.js',
