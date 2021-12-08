@@ -100,12 +100,12 @@ function renderAlgebra(id, txt, size = "") {
     const lines = txt.split('\n').filter(e => e != "");
     const gives = renderSimple("\\rightarrow", { mode, klass });
     for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+        const [line, comment = ""] = lines[i].split("::");
         const clean = cleanUpMathLex(line);
         const math = alg2tex(simplify(clean));
         newMath[i] = `<span>${line}</span>
         <span>${gives}</span>
-        <span>${renderSimple(math, { mode, klass })}</span>`;
+        <span>${renderSimple(math, { mode, klass })}</span><span>${comment}</span>`;
     }
     $(id).innerHTML = wrap(newMath, 'div');
 }
@@ -134,6 +134,7 @@ function plotGraph(parent, fu, size, colors) {
     try {
         const optdObj = plot(fu, size, colors);
         optdObj.target = "#" + div.id;
+        optdObj.grid = true;
         // @ts-ignore
         functionPlot(optdObj);
     } catch (e) {
@@ -173,8 +174,9 @@ const renderAll = () => {
         .replace(/^@opp( .+)?$/gm, (_, txt) => {
             return `<div class="oppgave">${txt || ""}</div>\n`;
         })
-        .replace(/^@fasit( .+)?$/gm, (_, txt) => {
-            return `<div class="fasit">${txt || ""}</div>\n`;
+        .replace(/^@fasit( synlig)?( .+)?$/gm, (_, synlig, txt) => {
+            const hidden = synlig ? "" : "skjult";
+            return `<div class="fasit ${hidden}">${txt || ""}</div>\n`;
         })
     const plainHTML = md.render(txt)
         .replace(/\$([^$]+)\$/gm, (_, m) => makeLatex(m, { mode: false, klass: "" }));

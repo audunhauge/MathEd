@@ -13,7 +13,7 @@ div.oppgave {
 }
 
 div.oppgave::before {
-    content: "Oppgave " counter(oppg-count) ") ";
+    content: "Oppgave "counter(oppg-count) ". ";
     color: blue;
     font-size: 1.5em;
 }
@@ -23,6 +23,24 @@ div.fasit {
     font-size: 1em;
     margin-bottom: 5px;
     margin-top: 5px;
+}
+
+@media print {
+
+    .oppgave, .math, .algebra, .plots {
+        page-break-inside : avoid;
+    }
+
+    .gui,
+    div.fasit.skjult {
+        display: none;
+    }
+
+   
+
+    div.fasit.skjult ~ * {
+        display: none;
+    }
 }
 
 div.fasit::before {
@@ -55,13 +73,6 @@ div.fasit::before {
     height: 16px;
 }
 
-/*
-.math > div {
-    min-height: 2px;
-    background-color: rgba(0, 128, 128, 0.178);
-    margin: 2px;
-}*/
-
 div.algebra,
 div.math {
     counter-reset: math-count;
@@ -93,7 +104,7 @@ div.math.bokstav>div>div:before {
 }
 
 div.algebra.number>div::before,
-div.algebra.nummer>div::before {
+div.math.nummer>div::before {
     content: counter(math-count) ") ";
     position: absolute;
     left: -40px;
@@ -105,6 +116,17 @@ div.math.likningsett>div>div:before {
     position: absolute;
     left: -40px;
     top: 0;
+}
+
+
+div.senter>div {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div.senter.abc, div.senter.nummer,
+div.senter.number, div.senter.bokstav {
+    margin-left: 3rem;
 }
 
 
@@ -153,12 +175,6 @@ div.plots>div {
     width: fit-content;
 }
 
-
-div.senter>div {
-    margin-left: auto;
-    margin-right: auto;
-}
-
 div.plots>div::before {
     position: absolute;
     left: 5px;
@@ -182,7 +198,7 @@ div.plots.nummer>div::before {
 
 div.algebra>div {
     display: grid;
-    grid-template-columns: 10fr 1fr 10fr;
+    grid-template-columns: 10fr 1fr 10fr 5fr;
     padding-bottom: 4px;
     color: darkgreen;
 }
@@ -195,4 +211,10 @@ div.algebra>div>span:nth-child(1) {
 div.algebra>div>span:nth-child(2) {
     text-align: center;
     padding: 0 16px;
+}
+
+div.algebra>div>span:nth-child(4) {
+    text-align: left;
+    padding: 0 16px;
+    color: gray;
 }
