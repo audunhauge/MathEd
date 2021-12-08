@@ -9,28 +9,47 @@ import {
 const { min, max } = Math;
 
 const web = updateMyProperties();
-const { files } = thingsWithId();
+const { examples, savedFiles } = thingsWithId();
 
 async function setup() {
-    let examples = getLocalJSON("examples");
+    let examples = getLocalJSON("examples");  // NOT CONST
     if (!examples) {
         // no examples - fetch them
         const url = "examples.json";
         const response = await fetch(url);
         examples = await response.json();
     }
-    web.files.push(...examples);
+    web.examples.push(...examples);
+    // saved files may be none
+    const savedFiles = getLocalJSON("savedfiles") || [];
+    web.savedFiles.push(...savedFiles);
 }
 
 setup();
 
-files.onclick = async (e) => {
+examples.onclick = async (e) => {
     const t = e.target;
     if (t.className === "file") {
-        const url = '/media/' + t.dataset.name;
+        const name = t.dataset.name;
+        const url = '/media/' + name;
         const response = await fetch(url);
-        const txt = await response.text();
-        setLocalJSON(sessionID,txt);
+        const txt = (response.ok)
+            ? await response.text()
+            : "Missing example";
+        setLocalJSON(sessionID, txt);
+        setLocalJSON("filename", name);
+        window.location.href = "./editor.html";
+    }
+}
+
+
+savedFiles.onclick = async (e) => {
+    const t = e.target;
+    if (t.className === "file") {
+        const name = t.dataset.name;
+        const txt = getLocalJSON("saved:" + name);
+        setLocalJSON(sessionID, txt);
+        setLocalJSON("filename", name);
         window.location.href = "./editor.html";
     }
 }

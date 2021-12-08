@@ -21,11 +21,23 @@
     </header>
     <main>
         <section>
-            <h3>Example files</h3>
-            Click one of the examples below to edit.
-           <div repeat id="files">
-               <div><label data-name="ex$.md" class="file">$</label></div>
-           </div>
+
+            <div class="grid-2">
+                <div>
+                    <h3>Example files</h3>
+                    Click one of the examples below to edit.
+                    <div repeat id="examples">
+                        <div><label data-name="ex$.md" class="file">$</label></div>
+                    </div>
+                </div>
+                <div>
+                    <h3>Saved files</h3>
+                    Click filename to edit.
+                    <div repeat id="savedFiles">
+                        <div><label data-name="$" class="file">$</label></div>
+                    </div>
+                </div>
+            </div>
         </section>
         <section class="info">
             <ul>
