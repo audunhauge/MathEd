@@ -63,7 +63,6 @@ const katx = (s, mode) => katex.renderToString(String(s), {
 function cleanUpMathLex(code) {
     if (code === "") return "";
     return code
-        .replace(/_/gm, "&_")
         .replace(/\*\*/gm, "^")
         .replace(/\)\(/gm, ")*(") // (x+a)(x-2) => (x+a)*(x-2)
         .replace(/([0-9])\(/gm, (m, a, b) => a + "*(")
@@ -169,7 +168,7 @@ function renderPlot(id, plot, klass = "") {
 
 function renderTrig(id, trig, klass = "") {
     const parent = $(id);
-    const [_, w = 350, sz = 8] = (klass.match(/ (\d+) (\d+)$/)) || [];
+    const [_, w = 350, sz = 8] = (klass.match(/ (\d+)? ?(\d+)?$/)) || [];
     //arent.style.setProperty("--min", String(width) + "px");
     const lines = trig.split('\n').filter(e => e != "");
     const svg = code2svg(lines, w, sz);
@@ -254,11 +253,21 @@ saveFileButton("save", filename, (newName) => {
     return ed.value;
 });
 
+
+// some simple attempts to avoid rerender
+let timestep=0;
+let oldtext = "";
 ed.onkeyup = (e) => {
+    const now = Date.now();
     const k = e.key;
     const render = k === "Enter" || k.includes("Arrow");
     if (render) {
-        renderAll();
+        const diff = oldtext !== ed.value;
+        if (diff && now > timestep + 1000) {
+          renderAll();
+          timestep = Date.now();
+          oldtext = ed.value;
+        }
     }
 }
 

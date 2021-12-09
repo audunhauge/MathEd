@@ -27,6 +27,11 @@ div.fasit {
 
 @media print {
 
+    div.format.page,
+    div.format.side {
+        page-break-after: always;
+    }
+
     .oppgave, .math, .algebra, .plots, code {
         page-break-inside: avoid;
     }
@@ -176,21 +181,21 @@ div.format.br {
     min-height: 1rem;
 }
 
-div.format.number~ul,
-div.format.abc~ul {
+div.format.number+ul,
+div.format.abc+ul {
     counter-reset: ul-count;
     padding: 0;
     padding-left: 3rem;
     list-style-type: none;
 }
 
-div.format.number~ul>li,
-div.format.abc~ul>li {
+div.format.number+ul>li,
+div.format.abc+ul>li {
     position: relative;
 }
 
-div.format.number~ul>li::before,
-div.format.abc~ul>li::before {
+div.format.number+ul>li::before,
+div.format.abc+ul>li::before {
     counter-increment: ul-count;
     position: absolute;
     left: -40px;
