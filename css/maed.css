@@ -94,6 +94,7 @@ div.math>div>div {
     grid-template-columns: 10fr 1fr 10fr;
 }
 
+div.algebra.bokstav>div::before,
 div.algebra.abc>div::before,
 div.math.abc>div>div:before,
 div.math.bokstav>div>div:before {
@@ -103,6 +104,8 @@ div.math.bokstav>div>div:before {
     top: 0;
 }
 
+div.math.number>div::before,
+div.algebra.nummer>div::before,
 div.algebra.number>div::before,
 div.math.nummer>div::before {
     content: counter(math-count) ") ";
@@ -111,6 +114,7 @@ div.math.nummer>div::before {
     top: 0;
 }
 
+div.algebra.iv>div::before,
 div.math.likningsett>div>div:before {
     content: counter(math-count, lower-roman) ") ";
     position: absolute;

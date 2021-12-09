@@ -26,12 +26,20 @@ ed.value = oldSession || "";
 web.filename = filename;
 
 
-// @ts-ignore
-const simplify = exp => Algebrite.simplify(exp);
-// @ts-ignore
-const roots = exp => Algebrite.root(exp);
+const simplify = exp => {
+    try {
+        // @ts-ignore
+        return Algebrite.simplify(exp);
+    } catch (e) {
+        console.log("Simplyfy ", e, exp);
+        return exp;
+    }
+}
+
 // algebrite to latex
-const alg2tex = alg => alg.toLatexString();
+const alg2tex = alg => (typeof alg === "string")
+    ? alg
+    : alg.toLatexString();
 
 
 // @ts-ignore
@@ -94,9 +102,8 @@ const renderLikning = (line, { mode, klass }) => {
 }
 
 function renderAlgebra(id, txt, size = "") {
-    //const clean = cleanUpMathLex(txt);
-    //const math = alg2tex(simplify(clean));
-    //renderMath(id, math);
+    // @ts-ignore
+    Algebrite.clearall();  // drop all old values
     const newMath = [];
     const mode = size.includes("senter");
     const klass = size;
@@ -105,8 +112,11 @@ function renderAlgebra(id, txt, size = "") {
     for (let i = 0; i < lines.length; i++) {
         const [line, comment = ""] = lines[i].split("::");
         const clean = cleanUpMathLex(line);
-        const math = alg2tex(simplify(clean));
-        newMath[i] = `<span>${line}</span>
+        const [lhs, rhs] = clean.split("=");
+        const math = (lhs && rhs && lhs.length > 1)
+            ? alg2tex(simplify(`roots(${lhs}-(${rhs}))`))
+            : alg2tex((simplify(clean),simplify(lhs)));
+        newMath[i] = `<span>${renderSimple(line, { mode, klass })}</span>
         <span>${gives}</span>
         <span>${renderSimple(math, { mode, klass })}</span><span>${comment}</span>`;
     }
@@ -153,7 +163,7 @@ function renderPlot(id, plot, klass = "") {
     for (let i = 0; i < lines.length; i++) {
         const pickApart = lines[i].match(/([^ ]+)( \d+)?( [0-9a-z#,]+)?/);
         const [_, fu, size = 500, colors] = pickApart;
-        plotGraph(parent, cleanUpMathLex(fu), min(size, width), colors);
+        plotGraph(parent, cleanUpMathLex(fu), min(size, +width), colors);
     }
 }
 
