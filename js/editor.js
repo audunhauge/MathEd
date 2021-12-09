@@ -182,11 +182,12 @@ function renderTrig(id, trig, klass = "") {
 }
 
 const renderAll = () => {
+    const textWithSingleNewLineAtEnd = ed.value.replace(/\n*$/,'\n');
     const plots = [];
     const maths = [];
     const algebra = [];
     const trigs = [];
-    const txt = ed.value
+    const txt = textWithSingleNewLineAtEnd
         .replace(/@plot( .+)?$([^€]+?)^$^/gm, (_, klass, plot, ofs) => {
             plots.push({ plot, id: `graf${ofs}`, klass });
             return `<div class="plots ${klass}" id="graf${ofs}"></div>\n`;
@@ -205,6 +206,9 @@ const renderAll = () => {
         })
         .replace(/^@opp( .+)?$/gm, (_, txt) => {
             return `<div class="oppgave">${txt || ""}</div>\n`;
+        })
+        .replace(/^@format( .+)?$/gm, (_, format) => {
+            return `<div class="format ${format}"></div>\n`;
         })
         .replace(/^@fasit( synlig)?( .+)?$/gm, (_, synlig, txt) => {
             const hidden = synlig ? "" : "skjult";

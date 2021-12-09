@@ -6,7 +6,7 @@
 
 div.oppgave {
     counter-increment: oppg-count;
-    color: green;
+    color: rgb(2, 49, 2);
     font-size: 1em;
     margin-bottom: 5px;
     margin-top: 5px;
@@ -27,8 +27,12 @@ div.fasit {
 
 @media print {
 
-    .oppgave, .math, .algebra, .plots {
-        page-break-inside : avoid;
+    .oppgave, .math, .algebra, .plots, code {
+        page-break-inside: avoid;
+    }
+
+    code {
+        color:black;
     }
 
     .gui,
@@ -36,9 +40,9 @@ div.fasit {
         display: none;
     }
 
-   
 
-    div.fasit.skjult ~ * {
+
+    div.fasit.skjult~* {
         display: none;
     }
 }
@@ -123,6 +127,32 @@ div.math.likningsett>div>div:before {
 }
 
 
+pre > code.language-python {
+    position: relative;
+    display: block;
+    padding:3px 20px 3px 30px;
+    margin-left: 2rem;
+    width: fit-content;
+    background-color: rgba(232, 236, 236, 0.294);
+    border-radius: 5px;
+    border:solid black 1px;
+    box-shadow: 2px 2px 2px gray;
+    overflow: hidden;
+}
+
+pre > code::before {
+    position: absolute;
+    display: block;
+    white-space: break-spaces;
+    color:darkgreen;
+    text-align: right;
+    left:10px;
+    top:4px;
+    width: 1rem;
+    height: 40rem;
+    content: "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25";
+}
+
 div.senter>div {
     margin-left: auto;
     margin-right: auto;
@@ -142,17 +172,51 @@ div.eq>span:nth-child(2) {
     text-align: center;
 }
 
+div.format.br {
+    min-height: 1rem;
+}
+
+div.format.number~ul,
+div.format.abc~ul {
+    counter-reset: ul-count;
+    padding: 0;
+    padding-left: 3rem;
+    list-style-type: none;
+}
+
+div.format.number~ul>li,
+div.format.abc~ul>li {
+    position: relative;
+}
+
+div.format.number~ul>li::before,
+div.format.abc~ul>li::before {
+    counter-increment: ul-count;
+    position: absolute;
+    left: -40px;
+    top: 0px;
+}
+
+div.format.abc~ul>li::before {
+    content: counter(ul-count, lower-alpha) ") ";
+}
+
+div.format.number~ul>li::before {
+    content: counter(ul-count) ") ";
+}
+
 #menu {
     display: grid;
-    width: 15rem;
+    width: 18rem;
     grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr));
 }
 
 #menu>div.button {
-    background-color: blue;
+    background-color: rgb(61, 61, 180);
     color: white;
     border-radius: 5px;
-    width: 4rem;
+    padding: 2px 4px;
+    width: 5rem;
     text-align: center;
     box-shadow: 2px 2px 2px black;
     transition: 200ms;

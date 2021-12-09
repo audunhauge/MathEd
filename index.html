@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Math test editor</title>
     <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/maed.css">
 </head>
 
 <body>
@@ -16,6 +17,9 @@
         <p>
             Uses markdown, mathlex, katex, algebrite and functionplot.
         </p>
+        <div id="menu" class="gui">
+            <div class="button" id="help">ShowHelp</div>
+        </div>
 
 
     </header>
@@ -27,27 +31,35 @@
                     <h3>Example files</h3>
                     Click one of the examples below to edit.
                     <div class="listing" repeat id="examples">
-                        <div data-name="ex$.md" class="file"><label >$</label></div>
+                        <div data-name="ex$.md" class="file"><label>$</label></div>
                     </div>
                 </div>
                 <div>
                     <h3>Recent files</h3>
                     Click filename to edit.
-                    <div  class="listing" repeat id="savedFiles">
+                    <div class="listing" repeat id="savedFiles">
                         <div data-name="$" class="file"><label>$</label></div>
                     </div>
                 </div>
             </div>
         </section>
-        <section class="info">
+        <section class="info hidden" id="info">
             <ul>
                 <li>@opp creates a question
-                    <p>
-                        Displays "Oppgave 1." in large font.
-                        The number increments for each @opp.
-                        The counter is reset by @fasit.
-                    </p>
+                    <pre>
+                    Displays "Oppgave 1." in large font.
+                    The number increments for each @opp.
+                    The counter is reset by @fasit.
+
+                    @opp (2p)
+                    Løs likningene
+                    </pre>
+                    <pre>
+                    Oppgave 1.  (2p)  // large font
+                    Løs likningene
+                    </pre>
                 </li>
+                <li>@fasit marks end of questions - solutions follow</li>
                 <li>@math starts a math block
                     <pre>
                     @math abc
@@ -55,28 +67,77 @@
                     2x+4
                 </pre>
                     <p>
-                        Displayed using KaTex:
+                    Displayed using KaTex:
                     <pre>
                     a)     xx+2x+3
                     b)     2x+4
                 </pre>
                     </p>
                 </li>
-                <li>@plot sets up for plotting graphs</li>
-                <li>@alg starts algebra block</li>
-                <li>@fasit marks end of questions - solutions follow</li>
-
+                <li>@plot sets up for plotting graphs
+                    <pre>
+                     @plot abc
+                     sin(x)
+                     cos(x)
+                    </pre>
+                    <pre>
+                     a) |graf for sin|    b) |graf for cos|
+                    </pre>
+                </li>
+                <li>@alg starts algebra block
+                    <pre>
+                    @alg number
+                    2+3
+                    x+4=6
+                    </pre>
+                    <pre>
+                    1) 2+3    --> 5
+                    2) x+4=6  --> 2
+                    </pre>
+                </li>
+                <li>@trig creates svg drawing using trig
+                    <pre>
+                    @trig senter 300 8
+                    p = new Point(1,1)
+                    tria = tri({p,a:6,b:6,c:6,ABC:"A,B,C",abc:"c,a,b",size:{w:300,s:8} }) 
+                    size = tria.size
+                    s = tria.center
+                    r = tria.radius
+                    tri2svg(tria)
+                    svgCircle(s,r,size)
+                    svgDot(s,size)
+                    svgText(s,null,"S",size)
+                    </pre>
+                    <svg id="trig489" width="300" viewBox="0 0  300 300"> 
+                        <g transform="scale(0.6)">
+                          <polygon points="37.50,262.50 262.50,262.50 150,67.64" stroke="blue" fill="none"></polygon><text font-size="100%" x="11.36" y="277.59">A</text><text font-size="100%" x="272.24" y="268.13">B</text><text font-size="100%" x="150" y="56.39">C</text><text font-size="100%" x="150" y="284.60" text-anchor="middle">c</text><text font-size="100%" x="215.99" y="159.45" text-anchor="start">a</text><text font-size="100%" x="84.01" y="159.45" text-anchor="end">b</text><circle cx="150" cy="197.55" r="64.95" stroke="blue" fill="none"></circle><circle cx="150" cy="197.55" r="3" fill="blue"></circle><path id="mm56545451" d="M 150 197.55 L 187.50 197.55"></path>
+                          <text font-size="100%"><textPath x="4" y="2.7320508075688776" startOffset="25%" href="#mm56545451">
+                          <tspan dy="-5">
+                          S
+                          </tspan>
+                          </textPath></text>
+                        </g>
+                      </svg>
+                </li>
+               
             </ul>
         </section>
     </main>
     <footer></footer>
     <script type="module">
+        import { thingsWithId, updateMyProperties } from './js/Minos.js';
         import './js/filemanager.js';
         window.onload = () => {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker
                     .register('./sw.js');
             }
+        }
+        const web = updateMyProperties();
+        const { help, info } = thingsWithId();
+        let opa = 0;
+        help.onclick = () => {
+            info.classList.toggle("hidden");
         }
     </script>
 </body>
