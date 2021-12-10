@@ -22,7 +22,7 @@ async function setup() {
     web.examples.push(...examples);
     // saved files may be none
     const savedFiles = getLocalJSON("savedfiles") || [];
-    web.savedFiles.push(...savedFiles);
+    web.savedFiles.push(...savedFiles.slice(0,5));
 }
 
 setup();

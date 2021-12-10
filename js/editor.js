@@ -114,7 +114,7 @@ function renderAlgebra(id, txt, size = "") {
         const [lhs, rhs] = clean.split("=");
         const math = (lhs && rhs && lhs.length > 1)
             ? alg2tex(simplify(`roots(${lhs}-(${rhs}))`))
-            : alg2tex((simplify(clean),simplify(lhs)));
+            : alg2tex((simplify(clean), simplify(lhs)));
         newMath[i] = `<span>${renderSimple(line, { mode, klass })}</span>
         <span>${gives}</span>
         <span>${renderSimple(math, { mode, klass })}</span><span>${comment}</span>`;
@@ -180,53 +180,98 @@ function renderTrig(id, trig, klass = "") {
     </svg>`;
 }
 
+let oldRest = [];
+
 const renderAll = () => {
-    const textWithSingleNewLineAtEnd = ed.value.replace(/\n*$/,'\n');
+    const textWithSingleNewLineAtEnd = ed.value.replace(/\n*$/, '\n');
     const plots = [];
     const maths = [];
     const algebra = [];
     const trigs = [];
-    const txt = textWithSingleNewLineAtEnd
-        .replace(/@plot( .+)?$([^€]+?)^$^/gm, (_, klass, plot, ofs) => {
-            plots.push({ plot, id: `graf${ofs}`, klass });
-            return `<div class="plots ${klass}" id="graf${ofs}"></div>\n`;
-        })
-        .replace(/@trig( .+)?$([^€]+?)^$^/gm, (_, klass, trig, ofs) => {
-            trigs.push({ trig, id: `trig${ofs}`, klass });
-            return `<div class="trig ${klass}" id="trig${ofs}"></div>\n`;
-        })
-        .replace(/^@math( .+)?$([^€]+?)^$^/gm, (_, size, math, ofs) => {
-            maths.push({ math, id: `ma${ofs}`, size });
-            return `<div class="math ${size}" id="ma${ofs}"></div>\n`;
-        })
-        .replace(/^@alg( .+)?$([^€]+?)^$^/gm, (_, size, math, ofs) => {
-            algebra.push({ math, id: `alg${ofs}`, size });
-            return `<div class="algebra ${size}" id="alg${ofs}"></div>\n`;
-        })
-        .replace(/^@opp( .+)?$/gm, (_, txt) => {
-            return `<div class="oppgave">${txt || ""}</div>\n`;
-        })
-        .replace(/^@format( .+)?$/gm, (_, format) => {
-            return `<div class="format ${format}"></div>\n`;
-        })
-        .replace(/^@fasit( synlig)?( .+)?$/gm, (_, synlig, txt) => {
-            const hidden = synlig ? "" : "skjult";
-            return `<div class="fasit ${hidden}">${txt || ""}</div>\n`;
-        })
-    const plainHTML = md.render(txt)
-        .replace(/\$([^$]+)\$/gm, (_, m) => makeLatex(m, { mode: false, klass: "" }));
-    mathView.innerHTML = plainHTML;
-    maths.forEach(({ math, id, size }) => {
-        renderMath(id, math, size);
+    const [prelude, ...rest] = textWithSingleNewLineAtEnd.split(/@opp/gm);
+
+    const prepped = (textWithSingleNewLineAtEnd, seg) =>
+        textWithSingleNewLineAtEnd
+            .replace(/@plot( .+)?$([^€]+?)^$^/gm, (_, klass, plot, ofs) => {
+                plots.push({ plot, id: `graf${ofs}`, klass, seg });
+                return `<div class="plots ${klass}" id="graf${ofs}"></div>\n`;
+            })
+            .replace(/@trig( .+)?$([^€]+?)^$^/gm, (_, klass, trig, ofs) => {
+                trigs.push({ trig, id: `trig${ofs}`, klass, seg });
+                return `<div class="trig ${klass}" id="trig${ofs}"></div>\n`;
+            })
+            .replace(/^@math( .+)?$([^€]+?)^$^/gm, (_, size, math, ofs) => {
+                maths.push({ math, id: `ma${ofs}`, size, seg });
+                return `<div  class="math ${size}" id="ma${ofs}"></div>\n`;
+            })
+            .replace(/^@alg( .+)?$([^€]+?)^$^/gm, (_, size, math, ofs) => {
+                algebra.push({ math, id: `alg${ofs}`, size, seg });
+                return `<div  class="algebra ${size}" id="alg${ofs}"></div>\n`;
+            })
+            .replace(/^@opp( .+)?$/gm, (_, txt) => {
+                return `<div class="oppgave">${txt || ""}</div>\n`;
+            })
+            .replace(/^@format( .+)?$/gm, (_, format) => {
+                return `<div class="format ${format}"></div>\n`;
+            })
+            .replace(/^@fasit( synlig)?( .+)?$/gm, (_, synlig, txt) => {
+                const hidden = synlig ? "" : "skjult";
+                return `<div class="fasit ${hidden}">${txt || ""}</div>\n`;
+            });
+
+    const dirtyList = [];
+    for (let i = 0; i < rest.length; i++) {
+        if (rest[i] !== oldRest[i]) {
+            dirtyList.push(i);
+        }
+    }
+    if (dirtyList.length === 1 && dirtyList[0] === rest.length) {
+        // just add a new section
+        const seg = dirtyList[0];
+        const newSection = rest[seg];  // the new @opp
+        const div = create('div');
+        div.innerHTML = `<div class="section" id="seg${seg}">` + prepped('@opp' + newSection, seg) + '</div>';
+        mathView.append(div);
+    } else if (oldRest.length !== rest.length) {
+        // just rerender everything
+        const preludeMath = '<div class="prelude">' + prepped(prelude, 0) + '</div>';
+        const restMath = rest.map((e, i) => `<div class="section" id="seg${i+1}">` + prepped('@opp' + e, i) + '</div>').join("");
+        const plainHTML = md.render(preludeMath + restMath)
+            .replace(/\$([^$]+)\$/gm, (_, m) => makeLatex(m, { mode: false, klass: "" }));
+        mathView.innerHTML = plainHTML;
+    } else {
+        // same length -just update the dirty ones
+        for (let i = 0; i < dirtyList.length; i++) {
+            const seg = dirtyList[i];
+            const txt = rest[seg];
+            $('seg' + seg).innerHTML = prepped('@opp' + txt, seg);
+        }
+    }
+
+
+
+
+
+    // now figure out which views have changed
+
+    oldRest = rest.slice();  // make copy
+
+    maths.forEach(({ math, id, size, seg }) => {
+        if (dirtyList.includes(seg))
+            renderMath(id, math, size);
+        $(id).classList.toggle("red");
     });
-    algebra.forEach(({ math, id, size }) => {
-        renderAlgebra(id, math, size)
+    algebra.forEach(({ math, id, size, seg }) => {
+        if (dirtyList.includes(seg))
+            renderAlgebra(id, math, size)
     });
-    plots.forEach(({ plot, id, klass }) => {
-        renderPlot(id, plot, klass);
+    plots.forEach(({ plot, id, klass, seg }) => {
+        if (dirtyList.includes(seg))
+            renderPlot(id, plot, klass);
     });
-    trigs.forEach(({ trig, id, klass }) => {
-        renderTrig(id, trig, klass);
+    trigs.forEach(({ trig, id, klass, seg }) => {
+        if (dirtyList.includes(seg))
+            renderTrig(id, trig, klass);
     });
     setLocalJSON(sessionID, ed.value);
 }
@@ -255,7 +300,7 @@ saveFileButton("save", filename, (newName) => {
 
 
 // some simple attempts to avoid rerender
-let timestep=0;
+let timestep = 0;
 let oldtext = "";
 ed.onkeyup = (e) => {
     const now = Date.now();
@@ -264,9 +309,9 @@ ed.onkeyup = (e) => {
     if (render) {
         const diff = oldtext !== ed.value;
         if (diff && now > timestep + 1000) {
-          renderAll();
-          timestep = Date.now();
-          oldtext = ed.value;
+            renderAll();
+            timestep = Date.now();
+            oldtext = ed.value;
         }
     }
 }
