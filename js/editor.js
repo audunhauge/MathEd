@@ -1,7 +1,7 @@
 // @ts-check
 
 import {
-    thingsWithId, updateMyProperties,
+    thingsWithId, updateMyProperties, qsa,
     wrap, $, create, getLocalJSON, setLocalJSON
 } from './Minos.js';
 
@@ -90,8 +90,8 @@ const renderSimple = (line, { mode, klass }) => {
 }
 
 const renderLikning = (line, { mode, klass }) => {
-    const [sep] = (line.match(/>=|<=|>|<|=/) || []);
-    const [left = "", right = ""] = line.split(sep);
+    const [sep = "="] = (line.match(/>=|<=|>|<|=/) || []);
+    const [left = "", right = "0"] = line.split(sep);
     const leftLatex = makeLatex(left, { mode, klass });
     const rightLatex = makeLatex(right, { mode, klass });
     const sepLatex = katx(seplist[sep], mode);
@@ -188,25 +188,30 @@ const renderAll = () => {
     const maths = [];
     const algebra = [];
     const trigs = [];
-    const [prelude, ...rest] = textWithSingleNewLineAtEnd.split(/@opp/gm);
-
+    let ofs = 1234;
+    const sections = textWithSingleNewLineAtEnd.split(/@opp/gm).map( e => e.replace(/\s+$/,'\n'));
+    const mdLatex = txt => md.render(txt).replace(/\$([^$]+)\$/gm, (_, m) => makeLatex(m, { mode: false, klass: "" }));
     const prepped = (textWithSingleNewLineAtEnd, seg) =>
         textWithSingleNewLineAtEnd
-            .replace(/@plot( .+)?$([^€]+?)^$^/gm, (_, klass, plot, ofs) => {
-                plots.push({ plot, id: `graf${ofs}`, klass, seg });
-                return `<div class="plots ${klass}" id="graf${ofs}"></div>\n`;
+            .replace(/@plot( .*)?$([^€]+?)^$^/gm, (_, klass, plot) => {
+                ofs++;
+                plots.push({ plot, id: `graf${seg}_${ofs}`, klass, seg });
+                return `<div class="plots ${klass}" id="graf${seg}_${ofs}"></div>\n`;
             })
-            .replace(/@trig( .+)?$([^€]+?)^$^/gm, (_, klass, trig, ofs) => {
-                trigs.push({ trig, id: `trig${ofs}`, klass, seg });
-                return `<div class="trig ${klass}" id="trig${ofs}"></div>\n`;
+            .replace(/@trig( .*)?$([^€]+?)^$^/gm, (_, klass, trig) => {
+                ofs++;
+                trigs.push({ trig, id: `trig${seg}_${ofs}`, klass, seg });
+                return `<div class="trig ${klass}" id="trig${seg}_${ofs}"></div>\n`;
             })
-            .replace(/^@math( .+)?$([^€]+?)^$^/gm, (_, size, math, ofs) => {
-                maths.push({ math, id: `ma${ofs}`, size, seg });
-                return `<div  class="math ${size}" id="ma${ofs}"></div>\n`;
+            .replace(/^@math( .*)?$([^€]+?)^$^/gm, (_, size, math) => {
+                ofs++;
+                maths.push({ math, id: `ma${seg}_${ofs}`, size, seg });
+                return `<div  class="math ${size}" id="ma${seg}_${ofs}"></div>\n`;
             })
-            .replace(/^@alg( .+)?$([^€]+?)^$^/gm, (_, size, math, ofs) => {
-                algebra.push({ math, id: `alg${ofs}`, size, seg });
-                return `<div  class="algebra ${size}" id="alg${ofs}"></div>\n`;
+            .replace(/^@alg( .*)?$([^€]+?)^$^/gm, (_, size, math) => {
+                ofs++;
+                algebra.push({ math, id: `alg${seg}_${ofs}`, size, seg });
+                return `<div  class="algebra ${size}" id="alg${seg}_${ofs}"></div>\n`;
             })
             .replace(/^@opp( .+)?$/gm, (_, txt) => {
                 return `<div class="oppgave">${txt || ""}</div>\n`;
@@ -220,31 +225,35 @@ const renderAll = () => {
             });
 
     const dirtyList = [];
-    for (let i = 0; i < rest.length; i++) {
-        if (rest[i] !== oldRest[i]) {
+    let rerend = false;
+    for (let i = 0; i < sections.length; i++) {
+        if (sections[i] !== oldRest[i]) {
             dirtyList.push(i);
         }
     }
-    if (dirtyList.length === 1 && dirtyList[0] === rest.length) {
-        // just add a new section
+    if (dirtyList.length === 1 && dirtyList[0] === sections.length - 1) {
+        // just append a new section
         const seg = dirtyList[0];
-        const newSection = rest[seg];  // the new @opp
+        const newSection = sections[seg];  // the new @opp
         const div = create('div');
-        div.innerHTML = `<div class="section" id="seg${seg}">` + prepped('@opp' + newSection, seg) + '</div>';
+        const plain = `<div class="section" id="seg${seg}">\n` + prepped('@opp' + newSection, seg) + '\n</div>';
+        div.innerHTML = mdLatex(plain);
         mathView.append(div);
-    } else if (oldRest.length !== rest.length) {
+    } else if (oldRest.length !== sections.length) {
         // just rerender everything
-        const preludeMath = '<div class="prelude">' + prepped(prelude, 0) + '</div>';
-        const restMath = rest.map((e, i) => `<div class="section" id="seg${i+1}">` + prepped('@opp' + e, i) + '</div>').join("");
-        const plainHTML = md.render(preludeMath + restMath)
-            .replace(/\$([^$]+)\$/gm, (_, m) => makeLatex(m, { mode: false, klass: "" }));
-        mathView.innerHTML = plainHTML;
+        const preludeMath = `<div class="prelude" id="seg0">\n` + mdLatex(prepped(sections[0], 0)) + '</div>';
+        const theSections = sections.slice(1);
+        const restMath = theSections.map((e, i) => `<div class="section" id="seg${i+1}">\n` + prepped('@opp' + e, i) + '\n</div>').join("");
+        mathView.innerHTML = mdLatex(preludeMath + restMath);
+        rerend = true;
     } else {
         // same length -just update the dirty ones
         for (let i = 0; i < dirtyList.length; i++) {
             const seg = dirtyList[i];
-            const txt = rest[seg];
-            $('seg' + seg).innerHTML = prepped('@opp' + txt, seg);
+            const txt = sections[seg];
+            const section = $('seg' + seg);
+            section.classList.toggle("red");
+            section.innerHTML = mdLatex(prepped('@opp' + txt, seg));
         }
     }
 
@@ -254,23 +263,22 @@ const renderAll = () => {
 
     // now figure out which views have changed
 
-    oldRest = rest.slice();  // make copy
+    oldRest = sections.slice();  // make copy
 
     maths.forEach(({ math, id, size, seg }) => {
-        if (dirtyList.includes(seg))
+        if (rerend || dirtyList.includes(seg))
             renderMath(id, math, size);
-        $(id).classList.toggle("red");
     });
     algebra.forEach(({ math, id, size, seg }) => {
-        if (dirtyList.includes(seg))
+        if (rerend || dirtyList.includes(seg))
             renderAlgebra(id, math, size)
     });
     plots.forEach(({ plot, id, klass, seg }) => {
-        if (dirtyList.includes(seg))
+        if (rerend || dirtyList.includes(seg))
             renderPlot(id, plot, klass);
     });
     trigs.forEach(({ trig, id, klass, seg }) => {
-        if (dirtyList.includes(seg))
+        if (rerend || dirtyList.includes(seg))
             renderTrig(id, trig, klass);
     });
     setLocalJSON(sessionID, ed.value);
@@ -307,6 +315,8 @@ ed.onkeyup = (e) => {
     const k = e.key;
     const render = k === "Enter" || k.includes("Arrow");
     if (render) {
+        // remove hot edit markers
+        qsa(".red").forEach(e => e.classList.remove("red"));
         const diff = oldtext !== ed.value;
         if (diff && now > timestep + 1000) {
             renderAll();
