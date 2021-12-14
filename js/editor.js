@@ -1,7 +1,7 @@
 // @ts-check
 
 import {
-    thingsWithId, updateMyProperties, qsa,
+    thingsWithId, updateMyProperties, qsa, qs,
     wrap, $, create, getLocalJSON, setLocalJSON
 } from './Minos.js';
 
@@ -183,12 +183,12 @@ function renderTrig(id, trig, klass = "") {
 let oldRest = [];
 
 const renderAll = () => {
-    const textWithSingleNewLineAtEnd = ed.value.replace(/\n*$/, '\n');
+    const textWithSingleNewLineAtEnd = ed.value.replace(/\n*$/, '\n').replace(/^@fasit/gm,'@opp fasit');
     const plots = [];
     const maths = [];
     const algebra = [];
     const trigs = [];
-    let ofs = 1234;
+    let ofs = 1234; // uniq id for math,alg etc
     const sections = textWithSingleNewLineAtEnd.split(/@opp/gm).map( e => e.replace(/\s+$/,'\n'));
     const mdLatex = txt => md.render(txt).replace(/\$([^$]+)\$/gm, (_, m) => makeLatex(m, { mode: false, klass: "" }));
     const prepped = (textWithSingleNewLineAtEnd, seg) =>
@@ -213,16 +213,14 @@ const renderAll = () => {
                 algebra.push({ math, id: `alg${seg}_${ofs}`, size, seg });
                 return `<div  class="algebra ${size}" id="alg${seg}_${ofs}"></div>\n`;
             })
-            .replace(/^@opp( .+)?$/gm, (_, txt) => {
-                return `<div class="oppgave">${txt || ""}</div>\n`;
+            .replace(/^@opp( fasit)?( synlig)?( .+)?$/gm, (_, fasit,synlig,txt) => {
+                const hr = fasit ? '<hr>' : '';
+                return `<div class="oppgave ${fasit} ${synlig}">${txt || ""} ${hr} </div>\n`;
             })
             .replace(/^@format( .+)?$/gm, (_, format) => {
                 return `<div class="format ${format}"></div>\n`;
-            })
-            .replace(/^@fasit( synlig)?( .+)?$/gm, (_, synlig, txt) => {
-                const hidden = synlig ? "" : "skjult";
-                return `<div class="fasit ${hidden}">${txt || ""}</div>\n`;
             });
+            
 
     const dirtyList = [];
     let rerend = false;
@@ -231,7 +229,7 @@ const renderAll = () => {
             dirtyList.push(i);
         }
     }
-    if (dirtyList.length === 1 && dirtyList[0] === sections.length - 1) {
+    if (dirtyList.length === 1 && dirtyList[0] === oldRest.length) {
         // just append a new section
         const seg = dirtyList[0];
         const newSection = sections[seg];  // the new @opp
@@ -254,6 +252,16 @@ const renderAll = () => {
             const section = $('seg' + seg);
             section.classList.toggle("red");
             section.innerHTML = mdLatex(prepped('@opp' + txt, seg));
+        }
+    }
+
+    // lift fasit out to the section level
+    const fasit = qs(".section > .fasit");
+    if (fasit) {
+        fasit.parentNode.classList.add("fasit");
+        fasit.parentNode.classList.remove("skjult");
+        if (!fasit.classList.contains("synlig")) {
+            fasit.parentNode.classList.add("skjult");
         }
     }
 
