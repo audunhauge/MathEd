@@ -19,6 +19,7 @@
         </p>
         <div id="menu" class="gui">
             <div class="button" id="help">ShowHelp</div>
+            <div class="button" id="newfile">New file</div>
         </div>
 
 
@@ -49,6 +50,8 @@
             </div>
         </section>
         <section class="info hidden" id="info">
+            <p><a href="https://www.markdownguide.org/cheat-sheet/"> Overskrifter og formatering</a></p>
+            <p><a href="http://mathlex.org/doc/language"> Skriv med flat matematisk notasjon</a></p>
             <ul>
                 <li>@opp creates a question
                     <pre>
@@ -72,7 +75,7 @@
                     2x+4
                 </pre>
                     <p>
-                    Displayed using KaTex:
+                        Displayed using KaTex:
                     <pre>
                     a)     xx+2x+3
                     b)     2x+4
@@ -113,24 +116,36 @@
                     svgDot(s,size)
                     svgText(s,null,"S",size)
                     </pre>
-                    <svg id="trig489" width="300" viewBox="0 0  300 300"> 
+                    <svg id="trig489" width="300" viewBox="0 0  300 300">
                         <g transform="scale(0.6)">
-                          <polygon points="37.50,262.50 262.50,262.50 150,67.64" stroke="blue" fill="none"></polygon><text font-size="100%" x="11.36" y="277.59">A</text><text font-size="100%" x="272.24" y="268.13">B</text><text font-size="100%" x="150" y="56.39">C</text><text font-size="100%" x="150" y="284.60" text-anchor="middle">c</text><text font-size="100%" x="215.99" y="159.45" text-anchor="start">a</text><text font-size="100%" x="84.01" y="159.45" text-anchor="end">b</text><circle cx="150" cy="197.55" r="64.95" stroke="blue" fill="none"></circle><circle cx="150" cy="197.55" r="3" fill="blue"></circle><path id="mm56545451" d="M 150 197.55 L 187.50 197.55"></path>
-                          <text font-size="100%"><textPath x="4" y="2.7320508075688776" startOffset="25%" href="#mm56545451">
-                          <tspan dy="-5">
-                          S
-                          </tspan>
-                          </textPath></text>
+                            <polygon points="37.50,262.50 262.50,262.50 150,67.64" stroke="blue" fill="none"></polygon>
+                            <text font-size="100%" x="11.36" y="277.59">A</text><text font-size="100%" x="272.24"
+                                y="268.13">B</text><text font-size="100%" x="150" y="56.39">C</text><text
+                                font-size="100%" x="150" y="284.60" text-anchor="middle">c</text><text font-size="100%"
+                                x="215.99" y="159.45" text-anchor="start">a</text><text font-size="100%" x="84.01"
+                                y="159.45" text-anchor="end">b</text>
+                            <circle cx="150" cy="197.55" r="64.95" stroke="blue" fill="none"></circle>
+                            <circle cx="150" cy="197.55" r="3" fill="blue"></circle>
+                            <path id="mm56545451" d="M 150 197.55 L 187.50 197.55"></path>
+                            <text font-size="100%">
+                                <textPath x="4" y="2.7320508075688776" startOffset="25%" href="#mm56545451">
+                                    <tspan dy="-5">
+                                        S
+                                    </tspan>
+                                </textPath>
+                            </text>
                         </g>
-                      </svg>
+                    </svg>
                 </li>
-               
+
             </ul>
+           
+
         </section>
     </main>
     <footer></footer>
     <script type="module">
-        import { thingsWithId, updateMyProperties } from './js/Minos.js';
+        import { thingsWithId, updateMyProperties, setLocalJSON } from './js/Minos.js';
         import './js/filemanager.js';
         window.onload = () => {
             if ('serviceWorker' in navigator) {
@@ -139,10 +154,17 @@
             }
         }
         const web = updateMyProperties();
-        const { help, info } = thingsWithId();
+        const { help, info, newfile } = thingsWithId();
         let opa = 0;
         help.onclick = () => {
             info.classList.toggle("hidden");
+        }
+        newfile.onclick = () => {
+            const txt = "# Prøve\n";
+            const sessionID = "mathEd";
+            setLocalJSON(sessionID, txt);
+            setLocalJSON("filename", name);
+            window.location.href = "./editor.html";
         }
     </script>
 </body>

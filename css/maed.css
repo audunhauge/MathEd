@@ -18,6 +18,16 @@ div.oppgave::before {
     font-size: 1.5em;
 }
 
+h1 {
+    display: grid;
+    grid-template-areas: "aa bb";
+    grid-template-columns: 1fr 200px;
+}
+
+h1 span.date {
+    grid-area: "bb";
+}
+
 .red {
     animation: blush 800ms forwards;
 }
@@ -161,6 +171,8 @@ pre>code.language-python {
     overflow: hidden;
 }
 
+
+/* line numbering for code */
 pre>code::before {
     position: absolute;
     display: block;
@@ -205,6 +217,12 @@ div.format.abc+ul {
     list-style-type: none;
 }
 
+span.date {
+    color:green;
+    font-size: 1rem;
+    font-weight: normal;
+}
+
 div.format.number+ul>li,
 div.format.abc+ul>li {
     position: relative;
@@ -242,6 +260,11 @@ div.format.number~ul>li::before {
     box-shadow: 2px 2px 2px black;
     transition: 200ms;
     cursor: pointer;
+    user-select: none;
+}
+
+#menu>div.button:hover {
+    background-color: rgb(112, 112, 204);
 }
 
 

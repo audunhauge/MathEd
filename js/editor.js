@@ -169,7 +169,6 @@ function renderPlot(id, plot, klass = "") {
 function renderTrig(id, trig, klass = "") {
     const parent = $(id);
     const [_, w = 350, sz = 8] = (klass.match(/ (\d+)? ?(\d+)?$/)) || [];
-    //arent.style.setProperty("--min", String(width) + "px");
     const lines = trig.split('\n').filter(e => e != "");
     const svg = code2svg(lines, w, sz);
     const s = Number(w) / 500;
@@ -183,13 +182,13 @@ function renderTrig(id, trig, klass = "") {
 let oldRest = [];
 
 const renderAll = () => {
-    const textWithSingleNewLineAtEnd = ed.value.replace(/\n*$/, '\n').replace(/^@fasit/gm,'@opp fasit');
+    const textWithSingleNewLineAtEnd = ed.value.replace(/\n*$/, '\n').replace(/^@fasit/gm, '@opp fasit');
     const plots = [];
     const maths = [];
     const algebra = [];
     const trigs = [];
     let ofs = 1234; // uniq id for math,alg etc
-    const sections = textWithSingleNewLineAtEnd.split(/@opp/gm).map( e => e.replace(/\s+$/,'\n'));
+    const sections = textWithSingleNewLineAtEnd.split(/@opp/gm).map(e => e.replace(/\s+$/, '\n'));
     const mdLatex = txt => md.render(txt).replace(/\$([^$]+)\$/gm, (_, m) => makeLatex(m, { mode: false, klass: "" }));
     const prepped = (textWithSingleNewLineAtEnd, seg) =>
         textWithSingleNewLineAtEnd
@@ -213,14 +212,19 @@ const renderAll = () => {
                 algebra.push({ math, id: `alg${seg}_${ofs}`, size, seg });
                 return `<div  class="algebra ${size}" id="alg${seg}_${ofs}"></div>\n`;
             })
-            .replace(/^@opp( fasit)?( synlig)?( .+)?$/gm, (_, fasit,synlig,txt) => {
+            .replace(/^@opp( fasit)?( synlig)?( .*)?$/gm, (_, fasit, synlig, txt) => {
                 const hr = fasit ? '<hr>' : '';
-                return `<div class="oppgave ${fasit} ${synlig}">${txt || ""} ${hr} </div>\n`;
+                return `<div class="oppgave ${fasit || ""} ${synlig || ""}">${txt || ""} ${hr} </div>\n`;
             })
             .replace(/^@format( .+)?$/gm, (_, format) => {
                 return `<div class="format ${format}"></div>\n`;
-            });
-            
+            })
+            .replace(/@dato( \d+)?/gm, (_, ofs) => {
+                const theDay = new Date();
+                theDay.setDate(theDay.getDate() + Number(ofs));
+                return `<span class="date">${theDay.toLocaleDateString('en-GB')}</span>`;
+            })
+
 
     const dirtyList = [];
     let rerend = false;
@@ -229,7 +233,14 @@ const renderAll = () => {
             dirtyList.push(i);
         }
     }
-    if (dirtyList.length === 1 && dirtyList[0] === oldRest.length) {
+    if (sections.length < 3 || oldRest.length !== sections.length) {
+        // just rerender everything
+        const preludeMath = `<div class="prelude" id="seg0">\n` + mdLatex(prepped(sections[0], 0)) + '</div>';
+        const theSections = sections.slice(1);
+        const restMath = theSections.map((e, i) => `<div class="section" id="seg${i + 1}">\n` + prepped('@opp' + e, i) + '\n</div>').join("");
+        mathView.innerHTML = mdLatex(preludeMath + restMath);
+        rerend = true;
+    } else if (dirtyList.length === 1 && dirtyList[0] === oldRest.length) {
         // just append a new section
         const seg = dirtyList[0];
         const newSection = sections[seg];  // the new @opp
@@ -237,13 +248,6 @@ const renderAll = () => {
         const plain = `<div class="section" id="seg${seg}">\n` + prepped('@opp' + newSection, seg) + '\n</div>';
         div.innerHTML = mdLatex(plain);
         mathView.append(div);
-    } else if (oldRest.length !== sections.length) {
-        // just rerender everything
-        const preludeMath = `<div class="prelude" id="seg0">\n` + mdLatex(prepped(sections[0], 0)) + '</div>';
-        const theSections = sections.slice(1);
-        const restMath = theSections.map((e, i) => `<div class="section" id="seg${i+1}">\n` + prepped('@opp' + e, i) + '\n</div>').join("");
-        mathView.innerHTML = mdLatex(preludeMath + restMath);
-        rerend = true;
     } else {
         // same length -just update the dirty ones
         for (let i = 0; i < dirtyList.length; i++) {
@@ -251,7 +255,11 @@ const renderAll = () => {
             const txt = sections[seg];
             const section = $('seg' + seg);
             section.classList.toggle("red");
-            section.innerHTML = mdLatex(prepped('@opp' + txt, seg));
+            if (seg === 0) {
+                section.innerHTML = mdLatex(prepped(txt, seg));
+            } else {
+                section.innerHTML = mdLatex(prepped('@opp' + txt, seg));
+            }
         }
     }
 
