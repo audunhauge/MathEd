@@ -7,6 +7,22 @@
     "scope": "/",
     "theme_color": "#3367D6",
     "description": "Math Editor",
+    "share_target": {
+        "action": "/edit.html",
+        "method": "POST",
+        "enctype": "multipart/form-data",
+        "params": {
+          "title": "name",
+          "text": "description",
+          "url": "link",
+          "files": [
+            {
+              "name": "tests",
+              "accept": ["text/csv", ".mtx"]
+            }
+          ]
+        }
+      },
     "icons": [
         {
             "src": "media/maed-128.png",
@@ -18,5 +34,20 @@
             "sizes": "144x144",
             "type": "image/png"
         }
-    ]
+    ],
+    "file_handlers": [
+        {
+          "action": "/open-mtx",
+          "accept": {
+            "text/plain": [".mtx"]
+          },
+          "icons": [
+            {
+              "src": "mtx-icon.png",
+              "sizes": "256x256",
+              "type": "image/png"
+            }
+          ]
+        }
+      ]
 }

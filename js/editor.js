@@ -216,7 +216,7 @@ const renderAll = () => {
                 const hr = fasit ? '<hr>' : '';
                 return `<div class="oppgave ${fasit || ""} ${synlig || ""}">${txt || ""} ${hr} </div>\n`;
             })
-            .replace(/^@format( .+)?$/gm, (_, format) => {
+            .replace(/^@format( .*)?$/gm, (_, format) => {
                 return `<div class="format ${format}"></div>\n`;
             })
             .replace(/@dato( \d+)?/gm, (_, ofs) => {
