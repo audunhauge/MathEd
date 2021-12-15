@@ -17,7 +17,7 @@ const { mathView, ed } = thingsWithId();
 
 const sessionID = "mathEd";
 const oldSession = getLocalJSON(sessionID);  // previous contents
-const filename = getLocalJSON("filename") || "test.mtx"; // filename
+const filename = getLocalJSON("filename") || "test.maz"; // filename
 
 // set starting font size to 50/50 rem
 web.fs = 50;   // math region font size

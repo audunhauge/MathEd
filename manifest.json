@@ -18,7 +18,7 @@
           "files": [
             {
               "name": "tests",
-              "accept": ["text/csv", ".mtx"]
+              "accept": ["text/plain", ".maz"]
             }
           ]
         }
@@ -37,9 +37,9 @@
     ],
     "file_handlers": [
         {
-          "action": "/open-mtx",
+          "action": "/open-maz",
           "accept": {
-            "text/plain": [".mtx"]
+            "text/plain": [".maz"]
           },
           "icons": [
             {
