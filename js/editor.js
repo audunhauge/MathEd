@@ -418,7 +418,6 @@ export function plot(str, size = 500, colors) {
         // @ts-ignore
         return optobj;
     } else if (typeof obj === "object") {
-        // type f
         // @ts-ignore
         return o;
     } else {
