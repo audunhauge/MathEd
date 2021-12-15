@@ -246,7 +246,7 @@ div.format.number~ul>li::before {
 
 #menu {
     display: grid;
-    width: 18rem;
+    width: 25rem;
     grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr));
 }
 

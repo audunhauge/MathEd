@@ -8,7 +8,7 @@
     "theme_color": "#3367D6",
     "description": "Math Editor",
     "share_target": {
-        "action": "/edit.html",
+        "action": "/index.html",
         "method": "POST",
         "enctype": "multipart/form-data",
         "params": {
@@ -37,13 +37,13 @@
     ],
     "file_handlers": [
         {
-          "action": "/edit.html",
+          "action": "/index.html",
           "accept": {
             "text/plain": [".maz"]
           },
           "icons": [
             {
-              "src": "mtx-icon.png",
+              "src": "maz-icon.png",
               "sizes": "256x256",
               "type": "image/png"
             }

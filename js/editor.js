@@ -5,25 +5,101 @@ import {
     wrap, $, create, getLocalJSON, setLocalJSON
 } from './Minos.js';
 
-import { code2svg } from './trig.js';
 
-const { min, max } = Math;
+window.onload = () => {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+            .register('./sw.js');
+    }
+}
+
+const { home, app, back, help, info, newfile, mathView, ed, examples, savedFiles } = thingsWithId();
+
 
 import { saveFileButton, readFileButton } from './filehandling.js';
 
 const web = updateMyProperties();
-// @ts-ignore
-const { mathView, ed } = thingsWithId();
-
 const sessionID = "mathEd";
-const oldSession = getLocalJSON(sessionID);  // previous contents
-const filename = getLocalJSON("filename") || "test.maz"; // filename
 
-// set starting font size to 50/50 rem
-web.fs = 50;   // math region font size
-web.efs = 50;  // editor font size
-ed.value = oldSession || "";
-web.filename = filename;
+const goHome = () => {
+    app.classList.add("hidden");
+    home.classList.remove("hidden");
+}
+
+let oldSession;
+
+const goEdit = () => {
+    app.classList.remove("hidden");
+    home.classList.add("hidden");
+    oldSession = getLocalJSON(sessionID);  // previous contents
+    const filename = getLocalJSON("filename") || "test.maz"; // filename
+    // set starting font size to 50/50 rem
+    web.fs = 50;   // math region font size
+    web.efs = 50;  // editor font size
+    ed.value = oldSession || "";
+    web.filename = filename;
+}
+
+help.onclick = () => {
+    info.classList.toggle("hidden");
+}
+
+back.onclick = goHome;
+
+
+
+newfile.onclick = () => {
+    const txt = "# Prøve\n";
+    setLocalJSON(sessionID, txt);
+    setLocalJSON("filename", "newfile");
+    goEdit();
+}
+
+
+async function setup() {
+    const url = "examples.json";
+    const response = await fetch(url);
+    const examples = await response.json();
+    web.examples.push(...examples);
+    // saved files may be none
+    const savedFiles = getLocalJSON("savedfiles") || [];
+    web.savedFiles.push(...savedFiles.slice(0, 5));
+}
+
+setup();
+
+examples.onclick = async (e) => {
+    const t = e.target;
+    if (t.className === "file") {
+        const name = t.dataset.name;
+        const url = '/media/' + name;
+        const response = await fetch(url);
+        const txt = (response.ok)
+            ? await response.text()
+            : "Missing example";
+        setLocalJSON(sessionID, txt);
+        setLocalJSON("filename", name);
+        goEdit();
+    }
+}
+
+
+savedFiles.onclick = async (e) => {
+    const t = e.target;
+    if (t.className === "file") {
+        const name = t.dataset.name;
+        const txt = getLocalJSON("saved:" + name);
+        setLocalJSON(sessionID, txt);
+        setLocalJSON("filename", name);
+        goEdit();
+    }
+}
+
+import { code2svg } from './trig.js';
+
+const { min, max } = Math;
+
+
 
 
 const simplify = exp => {
@@ -311,7 +387,7 @@ readFileButton("load", (file, text) => {
     web.filename = file.name;
 });
 
-saveFileButton("save", filename, (newName) => {
+saveFileButton("save", web.filename, (newName) => {
     setLocalJSON("filename", newName);
     web.filename = newName;
     const savedFiles = getLocalJSON("savedfiles") || [];
@@ -451,9 +527,12 @@ self.addEventListener('fetch', event => {
     // @ts-ignore
     if (event.request.method === 'POST' &&
         url.pathname === '/bookmark') {
+        // @ts-ignore
         event.respondWith((async () => {
+            // @ts-ignore
             const formData = await event.request.formData();
             const link = formData.get('link') || '';
+            // @ts-ignore
             const responseUrl = await saveBookmark(link);
             return Response.redirect(responseUrl, 303);
         })());

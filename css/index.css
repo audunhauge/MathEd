@@ -14,17 +14,22 @@ section.info.hidden {
     grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
 }
 
-.listing > div {
+.listing>div {
     width: fit-content;
     text-align: center;
     min-width: 5rem;
-    margin:4px;
-    padding:4px;
+    margin: 4px;
+    padding: 4px;
     background-color: darkseagreen;
-    color:white;
+    color: white;
     border-radius: 2px;
 }
 
 .listing label {
     pointer-events: none;
+}
+
+#home.hidden,
+#app.hidden {
+    display: none;
 }

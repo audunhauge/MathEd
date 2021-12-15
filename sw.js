@@ -2,7 +2,6 @@ var cacheName = 'mathEditor';
 var filesToCache = [
   '/',
   '/index.html',
-  '/editor.html',
   '/css/maed.css',
   '/css/index.css',
   '/media/maed-128.png',
