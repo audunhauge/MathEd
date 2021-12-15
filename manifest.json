@@ -37,7 +37,7 @@
     ],
     "file_handlers": [
         {
-          "action": "/open-maz",
+          "action": "/edit.html",
           "accept": {
             "text/plain": [".maz"]
           },
