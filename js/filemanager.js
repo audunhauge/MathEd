@@ -22,7 +22,7 @@ async function setup() {
     web.examples.push(...examples);
     // saved files may be none
     const savedFiles = getLocalJSON("savedfiles") || [];
-    web.savedFiles.push(...savedFiles.slice(0,5));
+    web.savedFiles.push(...savedFiles.slice(0, 5));
 }
 
 setup();
@@ -53,3 +53,36 @@ savedFiles.onclick = async (e) => {
         window.location.href = "./editor.html";
     }
 }
+
+// @ts-ignore
+if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
+    // @ts-ignore
+    launchQueue.setConsumer((launchParams) => {
+        // Nothing to do when the queue is empty.
+        if (!launchParams.files.length) {
+            return;
+        }
+        for (const fileHandle of launchParams.files) {
+            console.log(fileHandle);
+        }
+    });
+}
+
+
+
+self.addEventListener('fetch', event => {
+    // @ts-ignore
+    const url = new URL(event.request.url);
+    // If this is an incoming POST request for the
+    // registered "action" URL, respond to it.
+    // @ts-ignore
+    if (event.request.method === 'POST' &&
+        url.pathname === '/bookmark') {
+        event.respondWith((async () => {
+            const formData = await event.request.formData();
+            const link = formData.get('link') || '';
+            const responseUrl = await saveBookmark(link);
+            return Response.redirect(responseUrl, 303);
+        })());
+    }
+});

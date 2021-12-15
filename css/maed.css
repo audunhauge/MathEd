@@ -4,7 +4,7 @@
     counter-reset: oppg-count;
 }
 
-div.oppgave {
+div.section {
     counter-increment: oppg-count;
     color: rgb(2, 49, 2);
     font-size: 1em;
@@ -16,6 +16,16 @@ div.oppgave::before {
     content: "Oppgave "counter(oppg-count) ". ";
     color: blue;
     font-size: 1.5em;
+}
+
+h1 {
+    display: grid;
+    grid-template-areas: "aa bb";
+    grid-template-columns: 1fr 200px;
+}
+
+h1 span.date {
+    grid-area: "bb";
 }
 
 .red {
@@ -36,11 +46,8 @@ div.oppgave::before {
     }
 }
 
-div.fasit {
-    counter-reset: oppg-count;
-    font-size: 1em;
-    margin-bottom: 5px;
-    margin-top: 5px;
+div.section.fasit {
+    counter-reset: oppg-count -1;
 }
 
 @media print {
@@ -59,21 +66,21 @@ div.fasit {
     }
 
     .gui,
-    div.fasit.skjult {
+    div.section.fasit.skjult {
         display: none;
     }
 
 
 
-    div.fasit.skjult~* {
+    div.section.fasit.skjult ~ * {
         display: none;
     }
 }
 
-div.fasit::before {
+div.oppgave.fasit::before {
     content: "Fasit ";
-    color: rgb(3, 46, 3);
-    font-size: 1.5em;
+    color: rgb(90, 17, 12);
+    font-size: 2em;
 }
 
 #frame>div {
@@ -142,6 +149,7 @@ div.math.nummer>div::before {
 }
 
 div.algebra.iv>div::before,
+div.math.likningssett>div>div:before,
 div.math.likningsett>div>div:before {
     content: counter(math-count, lower-roman) ") ";
     position: absolute;
@@ -163,6 +171,8 @@ pre>code.language-python {
     overflow: hidden;
 }
 
+
+/* line numbering for code */
 pre>code::before {
     position: absolute;
     display: block;
@@ -207,6 +217,12 @@ div.format.abc+ul {
     list-style-type: none;
 }
 
+span.date {
+    color:green;
+    font-size: 1rem;
+    font-weight: normal;
+}
+
 div.format.number+ul>li,
 div.format.abc+ul>li {
     position: relative;
@@ -244,6 +260,11 @@ div.format.number~ul>li::before {
     box-shadow: 2px 2px 2px black;
     transition: 200ms;
     cursor: pointer;
+    user-select: none;
+}
+
+#menu>div.button:hover {
+    background-color: rgb(112, 112, 204);
 }
 
 

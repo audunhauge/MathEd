@@ -28,7 +28,7 @@ export const readFileButton = (id, cb) => {
             {
                 description: 'Text Files',
                 accept: {
-                    'text/plain': ['.mtx','.txt'],
+                    'text/plain': ['.maz','.txt'],
                 },
             },
         ],
@@ -51,7 +51,7 @@ async function getNewFileHandle(suggestedName) {
             {
                 description: 'Text Files',
                 accept: {
-                    'text/plain': ['.mtx'],
+                    'text/plain': ['.maz'],
                 },
             },
         ],
