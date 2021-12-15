@@ -6,13 +6,6 @@ import {
 } from './Minos.js';
 
 
-window.onload = () => {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker
-            .register('./sw.js');
-    }
-}
-
 const { home, app, back, help, info, newfile, mathView, ed, examples, savedFiles } = thingsWithId();
 
 
@@ -38,6 +31,9 @@ const goEdit = () => {
     web.efs = 50;  // editor font size
     ed.value = oldSession || "";
     web.filename = filename;
+    if (oldSession) {
+        renderAll();
+    }
 }
 
 help.onclick = () => {
@@ -374,10 +370,6 @@ const renderAll = () => {
             renderTrig(id, trig, klass);
     });
     setLocalJSON(sessionID, ed.value);
-}
-
-if (oldSession) {
-    renderAll();
 }
 
 

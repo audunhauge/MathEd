@@ -190,6 +190,12 @@
     </div>
 
     <script type="module">
+        window.onload = () => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker
+                    .register('./sw.js');
+            }
+        }
         import './js/editor.js';
     </script>
 </body>
