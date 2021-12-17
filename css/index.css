@@ -1,6 +1,7 @@
-section.info.hidden {
+.hidden {
     display: none;
 }
+
 
 .grid-2 {
     display: grid;

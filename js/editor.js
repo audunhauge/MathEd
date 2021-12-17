@@ -6,7 +6,8 @@ import {
 } from './Minos.js';
 
 
-const { home, app, back, help, info, newfile, mathView, ed, examples, savedFiles } = thingsWithId();
+const { home, app, back, aktiv, help, info, newfile,
+    mathView, ed, examples, savedFiles } = thingsWithId();
 
 
 import { saveFileButton, readFileButton } from './filehandling.js';
@@ -15,8 +16,12 @@ const web = updateMyProperties();
 const sessionID = "mathEd";
 
 const goHome = () => {
+    const filename = web.filename;
+    setLocalJSON("filename", filename);
+    web.current = filename;
     app.classList.add("hidden");
     home.classList.remove("hidden");
+    aktiv.classList.remove("hidden");
 }
 
 let oldSession;
@@ -41,6 +46,8 @@ help.onclick = () => {
 }
 
 back.onclick = goHome;
+
+aktiv.onclick = goEdit;
 
 
 
@@ -493,40 +500,3 @@ export function plot(str, size = 500, colors) {
         return {};
     }
 }
-
-
-// @ts-ignore
-if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
-    // @ts-ignore
-    launchQueue.setConsumer((launchParams) => {
-        // Nothing to do when the queue is empty.
-        if (!launchParams.files.length) {
-            return;
-        }
-        for (const fileHandle of launchParams.files) {
-            console.log(fileHandle);
-        }
-    });
-}
-
-
-
-self.addEventListener('fetch', event => {
-    // @ts-ignore
-    const url = new URL(event.request.url);
-    // If this is an incoming POST request for the
-    // registered "action" URL, respond to it.
-    // @ts-ignore
-    if (event.request.method === 'POST' &&
-        url.pathname === '/bookmark') {
-        // @ts-ignore
-        event.respondWith((async () => {
-            // @ts-ignore
-            const formData = await event.request.formData();
-            const link = formData.get('link') || '';
-            // @ts-ignore
-            const responseUrl = await saveBookmark(link);
-            return Response.redirect(responseUrl, 303);
-        })());
-    }
-});
