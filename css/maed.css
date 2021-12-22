@@ -330,3 +330,7 @@ div.algebra>div>span:nth-child(4) {
     padding: 0 16px;
     color: gray;
 }
+
+div.trig svg {
+    border:solid rgba(128, 128, 128, 0.144) 1px;
+}

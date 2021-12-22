@@ -98,7 +98,7 @@ savedFiles.onclick = async (e) => {
     }
 }
 
-import { code2svg } from './trig.js';
+import { code2svg, parse } from './trig.js';
 
 const { min, max } = Math;
 
@@ -148,6 +148,7 @@ function cleanUpMathLex(code) {
         .replace(/([0-9])([a-z])/gm, (m, a, b) => a + "*" + b);
 }
 
+
 const makeLatex = (txt, { mode, klass }) => {
     const clean = cleanUpMathLex(txt);
     try {
@@ -196,7 +197,7 @@ function renderAlgebra(id, txt, size = "") {
             : alg2tex((simplify(clean), simplify(lhs)));
         newMath[i] = `<span>${renderSimple(line, { mode, klass })}</span>
         <span>${gives}</span>
-        <span>${renderSimple(math, { mode, klass })}</span><span>${comment}</span>`;
+        <span>${katx(math, { mode, klass })}</span><span>${comment}</span>`;
     }
     $(id).innerHTML = wrap(newMath, 'div');
 }
@@ -247,12 +248,12 @@ function renderPlot(id, plot, klass = "") {
 
 function renderTrig(id, trig, klass = "") {
     const parent = $(id);
-    const [_, w = 350, sz = 8] = (klass.match(/ (\d+)? ?(\d+)?$/)) || [];
-    const lines = trig.split('\n').filter(e => e != "");
-    const svg = code2svg(lines, w, sz);
-    const s = Number(w) / 500;
+    const [_, w = 350, s = 8, scale=1] = (klass.match(/ (\d+\.?\d*)? ?(\d+\.?\d*)? ?([0-9.]+)?\s*$/)) || [];
+    const parsed = parse(trig,`{w:${w},s:${s}}`);
+    const lines = parsed.split('\n').filter(e => e != "");
+    const svg = code2svg(lines, w, s);
     parent.innerHTML = `<svg id="${id}" width="${w}" viewBox="0 0  ${w} ${w}"> 
-      <g transform="scale(${s})">
+      <g transform="scale(${scale})">
         ${svg}
       </g>
     </svg>`;
