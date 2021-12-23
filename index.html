@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MathEd</title>
     <link rel="manifest" href="manifest.json">
-    <!--  need math.js for evaluating expressions -->
     <script src="/js/remarkable.min.js"></script>
     <script src="/js/mathlex.min.js"></script>
     <script src="/js/katex/katex.min.js"></script>
@@ -117,15 +116,14 @@
                     <li>@trig creates svg drawing using trig
                         <pre>
                     @trig senter 300 8
-                    p = new Point(1,1)
-                    tria = tri({p,a:6,b:6,c:6,ABC:"A,B,C",abc:"c,a,b",size:{w:300,s:8} }) 
-                    size = tria.size
-                    s = tria.center
-                    r = tria.radius
-                    tri2svg(tria)
-                    svgCircle(s,r,size)
-                    svgDot(s,size)
-                    svgText(s,null,"S",size)
+                    p = (1,1)
+                    t = tri({p,a:6,b:6,c:6,ABC:"A,B,C",abc:"c,a,b" }) 
+                    s = t.center
+                    r = t.radius
+                    trekant(t)
+                    circle(s,r)
+                    dot(s)
+                    text(s,"S")
                     </pre>
                         <svg id="trig489" width="300" viewBox="0 0  300 300">
                             <g transform="scale(0.6)">

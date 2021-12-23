@@ -28,6 +28,5 @@ Forenkle uttrykkene
 @opp  (4p)
 Løs likninger/ulikheter
 @alg likning abc
-roots(x+2-5)
-roots(x+(x-1)/2-x/3)
-
+(x+2-5)=0
+(x+(x-1)/2-x/3)=0

@@ -197,7 +197,7 @@ function renderAlgebra(id, txt, size = "") {
             : alg2tex((simplify(clean), simplify(lhs)));
         newMath[i] = `<span>${renderSimple(line, { mode, klass })}</span>
         <span>${gives}</span>
-        <span>${katx(math, { mode, klass })}</span><span>${comment}</span>`;
+        <span>${katx(math, mode)}</span><span>${comment}</span>`;
     }
     $(id).innerHTML = wrap(newMath, 'div');
 }
