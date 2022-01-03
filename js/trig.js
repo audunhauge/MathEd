@@ -608,6 +608,7 @@ export const parse = (kode, size = "{w:300,s:8}") => kode
     .replace(/^([a-zA-Z])=([a-zA-Z])\s*\-\s*\[(.+),(.+)\]$/gm, (_, p, q, u, v) => `${p}=${q}.sub(new Point(${u},${v}))`)
     .replace(/^dot\((.+),(.+)\)$/gm, (_, u, v) => `dot(new Point(${u},${v}))`)
     .replace(/^dot\((.+)\)$/gm, (_, p) => `dot(${p})`)
+    .replace(/^square\(([^,)]+),([^,)]+),([^,)]+)\)$/gm, (_, p, w,h) => `square(${p},null,${w},${h})`)
     .replace(/^text\(([^,)]+),([^,)]+)\)$/gm, (_, p, s) => `text(${p},null,${s})`)
     .replace(/^text\(([^,)]+),([^,)]+),([^,)]+)\)$/gm, (_, p, q, s) => `text(${p},${q},${s})`)
     .replace(/^(.+)=tri\(([^{,]+),(.+),(.+),(.+)\)$/gm, (_, t, p, a, b, c) => `${t}=tri({p:${p},a:${a},b:${b},c:${c} })`)

@@ -28,13 +28,14 @@ Finn likningen for linja gjennom (2,3),(4,7)
 @opp Indre sirkel
 I figuren ser du en trekant med inskrevet sirkel, hva er radius i sirkelen?
 
+Bare demo - oppgavene har mangler/feil pensum osv.
+
 @trig senter 300 8
-p = new Point(1,1)
-tria = tri({p,a:6,b:6,c:6,ABC:"A,B,C",abc:"c,a,b",size:{w:300,s:8} }) 
-size = tria.size
-s = tria.center
-r = tria.radius
-tri2svg(tria)
-svgCircle(s,r,size)
-svgDot(s,size)
-svgText(s,null,"S",size)
+p = (1,1)
+t = tri({p,a:6,b:6 ,c:6,ABC:"A,B,C",abc:"c,$,b" }) 
+s = t.center
+r = t.radius
+trekant(t)
+circle(s,r)
+dot(s)
+text(s,"S")

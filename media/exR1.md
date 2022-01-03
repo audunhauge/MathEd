@@ -33,10 +33,9 @@ x**2-2x-2;3x-6,-3,5,-4,8
 
 Klargjør noen beregninger
 @alg  
-A=[[1,2],[3,4]]::matrise
-B=[16,-22]::vektor
-A::koeffs for likning
-B::høyreside
+A=[[1,2],[3,4]]::venstreside
+B=[16,-22]::høyreside
+
 
 A og B brukes til å løse likningssystemet
 
@@ -61,4 +60,4 @@ roots((x+4)(x+4)-2-3(x+4))
 @opp Nullpunkt
 Les av skjæring mellom $g(x)$ og $f(x)$
 @alg  
-roots(x**2-2x-2-(3x-6))
+(x**2-2x-2-(3x-6))=0

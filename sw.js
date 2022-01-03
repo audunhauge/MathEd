@@ -1,5 +1,6 @@
-var cacheName = 'mathEditor';
-var filesToCache = [
+const cacheName = 'mathEditor';
+const version = 2.2;
+const filesToCache = [
   '/',
   '/index.html',
   '/css/maed.css',
