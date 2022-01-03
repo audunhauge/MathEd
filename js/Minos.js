@@ -67,7 +67,7 @@ export const wipe = () => fill('');
  * changes to o.x will be updated into span.innerHTML
  * NOTE: start state not set, change o.x to set span.innerHTML
  */
-function prepTheWebPage() {
+function prepTheWebPage(klas="minos") {
     let idnum = 0;
     const allnames = {}; // all {names} and {exp + pressions}
     // will be filtered to seperate names/expressions
@@ -75,7 +75,7 @@ function prepTheWebPage() {
 
     // pick out any elements with id and repeat 
     {
-        const repeating = document.querySelectorAll('[repeat][id]');
+        const repeating = document.querySelectorAll(`.${klas} [repeat][id]`);
         repeating.forEach(node => {
             const orig = node.innerHTML;
             repeatList[node.id] = { node, orig }
@@ -85,7 +85,7 @@ function prepTheWebPage() {
     }
     // pick out any styles 
     {
-        const withStyle = document.querySelectorAll('[stil]');
+        const withStyle = document.querySelectorAll(`.${klas} [stil]`);
         withStyle.forEach(elm => elm.classList.add("stylish"));
 
         const list = document.querySelectorAll(".stylish");
@@ -107,7 +107,7 @@ function prepTheWebPage() {
     }
     // pick out any inputs with value="{name}" or id="name"
     {
-        const inps = document.querySelectorAll('input[name],select[name],input[id],select[id]');
+        const inps = document.querySelectorAll(`.${klas} :where(input[name],select[name],input[id],select[id])`);
         inps.forEach(inp => {
             const name = inp.getAttribute("name");
             const id = inp.getAttribute("id");
@@ -119,7 +119,7 @@ function prepTheWebPage() {
     }
     // pick out any {words} within innerHTML
     {
-        const list = document.querySelectorAll("div,span,label,p");
+        const list = document.querySelectorAll(`.${klas}`);
         list.forEach(l => {
             l.innerHTML = l.innerHTML.replace(/\{(.+?)\}/g, (m, t) => {
                 t = t.replace(/\&amp;/g,'&').replace(/\&gt;/g,'>').replace(/\&lt;/g,'<');
