@@ -144,8 +144,8 @@ function cleanUpMathLex(code) {
     return code
         .replace(/\*\*/gm, "^")
         .replace(/\)\(/gm, ")*(") // (x+a)(x-2) => (x+a)*(x-2)
-        .replace(/([0-9])\(/gm, (m, a, b) => a + "*(")
-        .replace(/([0-9])([a-z])/gm, (m, a, b) => a + "*" + b);
+        .replace(/([0-9])\(/gm, (m, a, b) => a + "*(")  // 3( => 3*(
+        .replace(/([0-9])([a-z])/gm, (m, a, b) => a + "*" + b); // 3a => 3*a
 }
 
 
@@ -234,6 +234,16 @@ function plotGraph(parent, fu, size, colors) {
     }
 }
 
+const alg2plot = fu => {
+    const fu2 = cleanUpMathLex(fu);
+    return fu2.replace(/e\^([a-z])/, (_,a) => {
+        return `exp(${a})`;
+    })
+    .replace(/e\^\(([^)]+)\)/, (_,a) => {
+        return `exp(${a})`;
+    })
+}
+
 function renderPlot(id, plot, klass = "") {
     const parent = $(id);
     const [_, width = 350] = (klass.match(/ (\d+)$/)) || [];
@@ -242,7 +252,7 @@ function renderPlot(id, plot, klass = "") {
     for (let i = 0; i < lines.length; i++) {
         const pickApart = lines[i].match(/([^ ]+)( \d+)?( [0-9a-z#,]+)?/);
         const [_, fu, size = 500, colors] = pickApart;
-        plotGraph(parent, cleanUpMathLex(fu), min(size, +width), colors);
+        plotGraph(parent, alg2plot(fu), min(size, +width), colors);
     }
 }
 
@@ -435,7 +445,7 @@ export function plot(str, size = 500, colors) {
     // b plot(x,-5,5) 200
     // c plot(x^2;x,-5,5,-25,25) 300 red,green,blue
     // d plot([[1,2],[3,4],[5,6]])
-    // e plot([[1,2,4,8,16,32])
+    // e plot([[1,2,4,8,16,32]])
     // f plot( {yAxis: {domain: [-1.897959183, 1.897959183]},xAxis: {domain: [-3, 3]},data: [{r: '2 * sin(4 theta)',fnType: 'polar',graphType: 'polyline' }] } )
     // f plot({target: '#multiple',data: [ { fn: 'x', color: 'pink' }, { fn: '-x' }, { fn: 'x * x' }, { fn: 'x * x * x' }, { fn: 'x * x * x * x' } ] } )
     let xmin = -5,
