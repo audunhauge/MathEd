@@ -6,7 +6,7 @@ var filesToCache = [
   '/css/index.css',
   '/media/maed-128.png',
   '/media/maed-144.png',
-  '/media/maz-icon.png',
+  '/media/mxy-icon.png',
   '/media/ex1P.md',
   '/media/ex2P.md',
   '/media/ex1T.md',

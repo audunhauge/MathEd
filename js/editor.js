@@ -30,7 +30,7 @@ const goEdit = () => {
     app.classList.remove("hidden");
     home.classList.add("hidden");
     oldSession = getLocalJSON(sessionID);  // previous contents
-    const filename = getLocalJSON("filename") || "test.maz"; // filename
+    const filename = getLocalJSON("filename") || "test.mxy"; // filename
     // set starting font size to 50/50 rem
     web.fs = 50;   // math region font size
     web.efs = 50;  // editor font size
